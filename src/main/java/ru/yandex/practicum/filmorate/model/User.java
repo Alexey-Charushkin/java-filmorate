@@ -2,35 +2,40 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.Setter;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Past;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 @Getter
 @Setter
 @EqualsAndHashCode
-//@AllArgsConstructor
 
 public class User {
 
-    private Integer id = 0;
+    private Integer id;
 
+    @Email
     private String email;
 
+    @NotBlank
     private String login;
 
+    @NonNull
     private String name;
 
+    @NonNull
+    @Past
     private LocalDate birthday;
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
     public User(String email, String login, String name, String birthday) {
-        this.id = id++;
         this.email = email;
         this.login = login;
         this.name = name;
-        this.birthday = LocalDate.parse(birthday, formatter);
+        this.birthday = LocalDate.parse(birthday);
     }
 }
