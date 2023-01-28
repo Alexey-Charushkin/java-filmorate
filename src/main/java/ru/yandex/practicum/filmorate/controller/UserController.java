@@ -21,9 +21,9 @@ public class UserController {
     public User create(@Valid @RequestBody User user) {
 
         Optional<String> userName = Optional.ofNullable(user.getName());
-        if (userName.isPresent()) {
-            if (user.getName().isEmpty()) user.setName(user.getLogin());
-        } else user.setName(user.getLogin());
+        if (!userName.isPresent() || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+        }
 
         log.info("Пользователь добавлен.");
         user.setId(userId);
