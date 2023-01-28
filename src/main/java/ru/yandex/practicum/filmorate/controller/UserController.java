@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.exceptions.EmptyUserException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
-import javax.validation.ValidationException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
