@@ -1,22 +1,20 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
+import javax.validation.constraints.NotBlank;
 import java.time.Duration;
 import java.time.LocalDate;
 
 @Getter
 @Setter
 @EqualsAndHashCode
-@AllArgsConstructor
-
 public class Film {
 
     private Integer id;
 
+    @NonNull
+    @NotBlank
     private String name;
 
     private String description;
@@ -25,4 +23,10 @@ public class Film {
 
     private Duration duration;
 
+    public Film(String name, String description, String releaseDate, String duration) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = LocalDate.parse(releaseDate);
+        this.duration = Duration.ofMinutes(Long.parseLong(duration));
+    }
 }

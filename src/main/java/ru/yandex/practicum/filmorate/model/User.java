@@ -1,9 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -13,6 +10,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @EqualsAndHashCode
+@AllArgsConstructor
 
 public class User {
 
@@ -24,17 +22,10 @@ public class User {
     @NotBlank
     private String login;
 
-    @NonNull
     private String name;
 
     @NonNull
     @Past
     private LocalDate birthday;
 
-    public User(String email, String login, String name, String birthday) {
-        this.email = email;
-        this.login = login;
-        this.name = name;
-        this.birthday = LocalDate.parse(birthday);
-    }
 }

@@ -7,15 +7,17 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RestController
 public class UserController {
 
     private Integer userId = 1;
-    Set<User> users = new HashSet<>();
+    private Set<User> users = new HashSet<>();
 
     @PostMapping("/users")
     public User create(@Valid @RequestBody User user) {
@@ -36,7 +38,6 @@ public class UserController {
     public User update(@Valid @RequestBody User user) {
 
         Optional<User> oldUser = users.stream().filter(u -> u.getId().equals(user.getId())).findAny();
-
         if (oldUser.isPresent()) {
             log.info("Пользователь обновлён.");
             users.remove(oldUser.get());
@@ -50,9 +51,10 @@ public class UserController {
     }
 
     @GetMapping("/users")
-    public Set<User> findAll() {
-        log.info("Текущее количество пользователей: {}", users.size());
-        return users;
+    public List<User> findAll() {
+        List allUsers = users.stream().collect(Collectors.toList());
+        log.info("Текущее количество пользователей: {}", allUsers.size());
+        return allUsers;
     }
 
 }
