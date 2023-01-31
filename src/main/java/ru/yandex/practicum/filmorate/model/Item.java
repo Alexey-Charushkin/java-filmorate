@@ -8,5 +8,4 @@ import lombok.Setter;
 public abstract class Item {
 
     protected Integer id;
-
 }

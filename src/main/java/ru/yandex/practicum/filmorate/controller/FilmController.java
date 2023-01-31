@@ -1,10 +1,5 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.TypeAdapter;
-import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.EmptyFilmException;
@@ -15,11 +10,8 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationReleaseDateException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -29,17 +21,7 @@ import java.util.stream.Collectors;
 @Log4j2
 @RestController
 public class FilmController {
-    public static class DurationAdapter extends TypeAdapter<Duration> {
-        @Override
-        public void write(JsonWriter jsonWriter, Duration duration) throws IOException {
-            jsonWriter.value(duration.toMinutes());
-        }
 
-        @Override
-        public Duration read(JsonReader jsonReader) throws IOException {
-            return Duration.ofMinutes(Long.parseLong(jsonReader.nextString()));
-        }
-    }
     private Integer filmId = 1;
 
     private Set<Film> films = new HashSet<>();
@@ -112,5 +94,5 @@ public class FilmController {
         }
         return isValid;
     }
-    
+
 }
