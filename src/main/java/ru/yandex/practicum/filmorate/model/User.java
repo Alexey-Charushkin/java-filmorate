@@ -12,9 +12,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 @AllArgsConstructor
 
-public class User {
-
-    private Integer id;
+public class User extends Item {
 
     @Email
     private String email;

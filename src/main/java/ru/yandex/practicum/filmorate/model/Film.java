@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 import javax.validation.constraints.NotBlank;
 import java.time.Duration;
@@ -9,9 +10,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @EqualsAndHashCode
-public class Film {
-
-    private Integer id;
+@AllArgsConstructor
+public class Film extends Item {
 
     @NonNull
     @NotBlank
@@ -23,10 +23,4 @@ public class Film {
 
     private Duration duration;
 
-    public Film(String name, String description, String releaseDate, String duration) {
-        this.name = name;
-        this.description = description;
-        this.releaseDate = LocalDate.parse(releaseDate);
-        this.duration = Duration.ofMinutes(Long.parseLong(duration));
-    }
 }
