@@ -65,27 +65,11 @@ class FilmorateApplicationTests {
     @Test
     void FilmFailDescriptionValidate() throws RuntimeException {
 
-       // ResponseEntity<Film> response = restTemplate.postForEntity("/films", filmFailDescription, Film.class);
-
         assertThrows(ValidationDescriptionSizeException.class, () -> controller.filmValidate(filmFailDescription),
                 "Исключение не сгенерировано.");
         ResponseEntity<Film> response = restTemplate.postForEntity("/films", filmFailDescription, Film.class);
         assertThat(response.getStatusCode(), is(HttpStatus.BAD_REQUEST));
-        //  assertThat(, is(""));
 
-        //  assertThat(response.);
-
-//            assertThat(response.getBody().getId(), notNullValue());
-//            assertThat(response.getBody().getName(), is("nisi eiusmod"));
-//            assertThat(response.getBody().getDescription(), is("adipisicing"));
-//            assertThat(response.getBody().getReleaseDate().toString(), is("1967-03-25"));
-//            assertThat(response.getBody().getDuration().toMinutes(), is(100L));
-        //   } catch (ValidationDescriptionSizeException exc) {
-
-        //    }
-//        assertThrows(BookNotFoundException.class,
-//                () -> bookService.getBookByTitle("Head First Spring"),
-//                "Different exception thrown!");
     }
 
     @Test
