@@ -9,6 +9,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
+@ToString
 @EqualsAndHashCode
 @AllArgsConstructor
 public class Film extends Item {
@@ -16,11 +17,8 @@ public class Film extends Item {
     @NonNull
     @NotBlank
     private String name;
-
     private String description;
-
     private LocalDate releaseDate;
-
-    private Duration duration;
+    private Integer duration;
 
 }

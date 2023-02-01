@@ -31,19 +31,19 @@ class FilmorateApplicationTests {
     FilmController controller = new FilmController();
 
     Film film = new Film("Super Film", "Super film description",
-            LocalDate.of(1967, 3, 25), Duration.ofMinutes(100));
+            LocalDate.of(1967, 3, 25), 100);
 
     Film filmFailDescription = new Film("Film name", "Пятеро друзей ( комик-группа «Шарло»)," +
             " приезжают в город Бризуль. Здесь они хотят разыскать господина Огюста Куглова," +
             " который задолжал им деньги, а именно 20 миллионов. о Куглов, который за время «своего отсутствия»," +
             " стал кандидатом Коломбани.",
-            LocalDate.of(1900, 3, 25), Duration.ofMinutes(250));
+            LocalDate.of(1900, 3, 25), 250);
 
     Film filmFailReleaseDate = new Film("Name", "Description",
-            LocalDate.of(1890, 3, 25), Duration.ofMinutes(200));
+            LocalDate.of(1890, 3, 25), 200);
 
     Film filmFailDuration = new Film("Film Name", "Film Description",
-            LocalDate.of(1890, 3, 25), Duration.ofMinutes(-50));
+            LocalDate.of(1890, 3, 25), -50);
 
     @Test
     void contextLoads() { }
@@ -57,7 +57,7 @@ class FilmorateApplicationTests {
         assertThat(response.getBody().getName(), is("Super Film"));
         assertThat(response.getBody().getDescription(), is("Super film description"));
         assertThat(response.getBody().getReleaseDate().toString(), is("1967-03-25"));
-        assertThat(response.getBody().getDuration().toMinutes(), is(100L));
+        assertThat(response.getBody().getDuration(), is(100L));
     }
 
     @Test
