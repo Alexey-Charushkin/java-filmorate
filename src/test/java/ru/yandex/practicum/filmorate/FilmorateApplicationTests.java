@@ -9,13 +9,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.ValidationDescriptionSizeException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationDurationException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationReleaseDateException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.Duration;
 import java.time.LocalDate;
+import java.util.Objects;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
@@ -27,55 +29,66 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class FilmorateApplicationTests {
     @Autowired
     private TestRestTemplate restTemplate;
+    FilmController filmController = new FilmController();
+    UserController userController = new UserController();
 
-    FilmController controller = new FilmController();
-
+    User userFailName = new User("friend@common.ru",
+            "userLogin", null, LocalDate.of(2000, 8, 20));
     Film film = new Film("Super Film", "Super film description",
             LocalDate.of(1967, 3, 25), 100);
-
     Film filmFailDescription = new Film("Film name", "Пятеро друзей ( комик-группа «Шарло»)," +
             " приезжают в город Бризуль. Здесь они хотят разыскать господина Огюста Куглова," +
             " который задолжал им деньги, а именно 20 миллионов. о Куглов, который за время «своего отсутствия»," +
             " стал кандидатом Коломбани.",
             LocalDate.of(1900, 3, 25), 250);
-
     Film filmFailReleaseDate = new Film("Name", "Description",
             LocalDate.of(1890, 3, 25), 200);
-
     Film filmFailDuration = new Film("Film Name", "Film Description",
             LocalDate.of(1890, 3, 25), -50);
 
-    @Test
-    void contextLoads() { }
+      @Test
+    void contextLoads() {
+    }
 
     @Test
     void filmValidate() {
-        controller.filmValidate(film);
+        filmController.validate(film);
         ResponseEntity<Film> response = restTemplate.postForEntity("/films", film, Film.class);
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
-        assertThat(response.getBody().getId(), notNullValue());
+        assertThat(Objects.requireNonNull(response.getBody()).getId(), notNullValue());
         assertThat(response.getBody().getName(), is("Super Film"));
         assertThat(response.getBody().getDescription(), is("Super film description"));
         assertThat(response.getBody().getReleaseDate().toString(), is("1967-03-25"));
-        assertThat(response.getBody().getDuration(), is(100L));
+        assertThat(response.getBody().getDuration(), is(100));
     }
 
     @Test
     void FilmFailDescriptionValidate() throws RuntimeException {
-        assertThrows(ValidationDescriptionSizeException.class, () -> controller.filmValidate(filmFailDescription),
+        assertThrows(ValidationDescriptionSizeException.class, () -> filmController.validate(filmFailDescription),
                 "Исключение не сгенерировано.");
     }
 
     @Test
     void FilmFailFailReleaseDateValidate() throws RuntimeException {
-        assertThrows(ValidationReleaseDateException.class, () -> controller.filmValidate(filmFailReleaseDate),
+        assertThrows(ValidationReleaseDateException.class, () -> filmController.validate(filmFailReleaseDate),
                 "Исключение не сгенерировано.");
     }
 
     @Test
     void FilmFailFailDurationValidate() throws RuntimeException {
-        assertThrows(ValidationDurationException.class, () -> controller.filmValidate(filmFailDuration),
+        assertThrows(ValidationDurationException.class, () -> filmController.validate(filmFailDuration),
                 "Исключение не сгенерировано.");
+    }
+
+    @Test
+    void UserFailNameValidate() {
+        userController.validate(userFailName);
+        ResponseEntity<User> response = restTemplate.postForEntity("/users", userFailName, User.class);
+        assertThat(response.getStatusCode(), is(HttpStatus.OK));
+        assertThat(Objects.requireNonNull(response.getBody()).getId(), notNullValue());
+        assertThat(response.getBody().getName(), is("userLogin"));
+        assertThat(response.getBody().getLogin(), is("userLogin"));
+        assertThat(response.getBody().getBirthday().toString(), is("2000-08-20"));
     }
 
 }

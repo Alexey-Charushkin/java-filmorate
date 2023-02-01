@@ -10,10 +10,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode
 @AllArgsConstructor
 public class User extends Item {
-
     @Email
     private String email;
     @NotBlank
