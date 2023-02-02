@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,8 @@ import java.util.*;
 @Getter
 @Setter
 @Log4j2
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class AbstractController<T extends Item> {
     private final Map<Long, T> data = new HashMap<>();
     private Long id = 0L;
