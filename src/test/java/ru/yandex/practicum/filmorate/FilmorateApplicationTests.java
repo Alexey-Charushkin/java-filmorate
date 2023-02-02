@@ -28,9 +28,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class FilmorateApplicationTests {
     @Autowired
-    private TestRestTemplate restTemplate;
-    FilmController filmController = new FilmController();
-    UserController userController = new UserController();
+    TestRestTemplate restTemplate;
+    @Autowired
+    FilmController filmController;
+    @Autowired
+    UserController userController;
 
     User userFailName = new User("friend@common.ru",
             "userLogin", null, LocalDate.of(2000, 8, 20));
