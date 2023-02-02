@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode
 public abstract class Item {
-    protected Integer id;
+    protected Long id;
 }

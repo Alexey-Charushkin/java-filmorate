@@ -2,19 +2,22 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
+import ru.yandex.practicum.filmorate.exceptions.EmptyUserException;
 import ru.yandex.practicum.filmorate.model.Item;
+import lombok.extern.log4j.Log4j2;
+
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Getter
 @Setter
+@Log4j2
 public abstract class AbstractController<T extends Item> {
-    private final Map<Integer, T> data = new HashMap<>();
-    private Integer id = 0;
+    private final Map<Long, T> data = new HashMap<>();
+    private Long id = 0L;
 
     public T create(@Valid @RequestBody T item) {
         validate(item);
@@ -23,15 +26,21 @@ public abstract class AbstractController<T extends Item> {
         return item;
     }
 
-    public T update(@Valid @RequestBody T item) {
+    public ResponseEntity<?> update(@Valid @RequestBody T item) {
+        List<T> items = findAll();
+        Optional<T> oldItem = items.stream().filter(u -> u.getId().equals(item.getId())).findAny();
+        if (!oldItem.isPresent()) {
+            log.warn("Ошибка обновления id {} отсутствует в базе.", item.getId());
+            throw new EmptyUserException();
+        }
         validate(item);
-        item.setId(id);
         data.put(id, item);
-        return item;
+        return new ResponseEntity<>(item, HttpStatus.OK);
     }
 
     public List<T> findAll() {
         return new ArrayList<>(data.values());
-   }
+    }
+
     abstract void validate(T item);
 }

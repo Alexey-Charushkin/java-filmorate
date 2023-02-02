@@ -1,8 +1,9 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.EmptyFilmException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationDescriptionSizeException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationDurationException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationReleaseDateException;
@@ -15,10 +16,11 @@ import java.util.Optional;
 
 @Log4j2
 @RestController
+@RequestMapping("/films")
 public class FilmController extends AbstractController<Film> {
     private boolean isValid = true;
 
-    @PostMapping("/films")
+    @PostMapping()
     public Film create(@Valid @RequestBody Film film) {
         if (isValid) {
             log.info("Фильм добавлен {}.", film);
@@ -26,20 +28,18 @@ public class FilmController extends AbstractController<Film> {
         return super.create(film);
     }
 
-    @PutMapping("/films")
-    public Film update(@Valid @RequestBody Film film) {
-        List<Film> films = super.findAll();
-        Optional<Film> oldFilm = films.stream().filter(u -> u.getId().equals(film.getId())).findAny();
-        if (oldFilm.isPresent()) {
+    @PutMapping()
+    public ResponseEntity<?> update(@Valid @RequestBody Film film) {
+        try {
             log.info("Фильм обновлён {}.", film);
             return super.update(film);
-        } else {
-            log.warn("Невозможно обновить фильм, так ка его нет в базе.");
-            throw new EmptyFilmException();
+        } catch (Exception exc) {
+            log.info("Не обновлено! Фильм {} отсутствует в базе.", film.getName());
+            return new ResponseEntity<>(film, HttpStatus.NOT_FOUND);
         }
     }
 
-    @GetMapping("/films")
+    @GetMapping()
     public List<Film> findAll() {
         List<Film> films = super.findAll();
         log.info("Текущее количество фильмов: {}", films.size());
