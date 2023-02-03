@@ -31,8 +31,7 @@ public abstract class AbstractController<T extends Item> {
     }
 
     public ResponseEntity<?> update(@Valid @RequestBody T item) {
-        List<T> items = findAll();
-        Optional<T> oldItem = items.stream().filter(u -> u.getId().equals(item.getId())).findAny();
+        Optional<T> oldItem = Optional.ofNullable(data.get(item.getId()));
         if (!oldItem.isPresent()) {
             log.warn("Ошибка обновления id {} отсутствует в базе.", item.getId());
             throw new EmptyUserException();
