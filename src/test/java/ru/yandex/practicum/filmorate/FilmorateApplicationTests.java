@@ -15,6 +15,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationDurationException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationReleaseDateException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.Validate;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -33,6 +34,8 @@ class FilmorateApplicationTests {
     private FilmController filmController;
     @Autowired
     private UserController userController;
+    @Autowired
+    private Validate validate;
 
     User userFailName = new User("friend@common.ru",
             "userLogin", null, LocalDate.of(2000, 8, 20));
@@ -48,13 +51,13 @@ class FilmorateApplicationTests {
     Film filmFailDuration = new Film("Film Name", "Film Description",
             LocalDate.of(1890, 3, 25), -50);
 
-      @Test
+    @Test
     void contextLoads() {
     }
 
     @Test
     void filmValidate() {
-        filmController.validate(film);
+        validate.validate(film);
         ResponseEntity<Film> response = restTemplate.postForEntity("/films", film, Film.class);
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         assertThat(Objects.requireNonNull(response.getBody()).getId(), notNullValue());
@@ -66,25 +69,25 @@ class FilmorateApplicationTests {
 
     @Test
     void FilmFailDescriptionValidate() throws RuntimeException {
-        assertThrows(ValidationDescriptionSizeException.class, () -> filmController.validate(filmFailDescription),
+        assertThrows(ValidationDescriptionSizeException.class, () -> validate.validate(filmFailDescription),
                 "Исключение не сгенерировано.");
     }
 
     @Test
     void FilmFailFailReleaseDateValidate() throws RuntimeException {
-        assertThrows(ValidationReleaseDateException.class, () -> filmController.validate(filmFailReleaseDate),
+        assertThrows(ValidationReleaseDateException.class, () -> validate.validate(filmFailReleaseDate),
                 "Исключение не сгенерировано.");
     }
 
     @Test
     void FilmFailFailDurationValidate() throws RuntimeException {
-        assertThrows(ValidationDurationException.class, () -> filmController.validate(filmFailDuration),
+        assertThrows(ValidationDurationException.class, () -> validate.validate(filmFailDuration),
                 "Исключение не сгенерировано.");
     }
 
     @Test
     void UserFailNameValidate() {
-        userController.validate(userFailName);
+        validate.validate(userFailName);
         ResponseEntity<User> response = restTemplate.postForEntity("/users", userFailName, User.class);
         assertThat(response.getStatusCode(), is(HttpStatus.OK));
         assertThat(Objects.requireNonNull(response.getBody()).getId(), notNullValue());

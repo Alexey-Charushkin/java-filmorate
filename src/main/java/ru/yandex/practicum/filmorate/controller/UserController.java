@@ -37,12 +37,4 @@ public class UserController extends AbstractController<User> {
         log.info("Текущее количество пользователей: {}", users.size());
         return users;
     }
-
-    @Override
-    public void validate(User item) {
-        Optional<String> userName = Optional.ofNullable(item.getName());
-        if (!userName.isPresent() || item.getName().isEmpty()) {
-            item.setName(item.getLogin());
-        }
-    }
 }

@@ -4,12 +4,14 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exceptions.EmptyUserException;
 import ru.yandex.practicum.filmorate.model.Item;
 import lombok.extern.log4j.Log4j2;
+import ru.yandex.practicum.filmorate.service.Validate;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -20,11 +22,14 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public abstract class AbstractController<T extends Item> {
+
+    @Autowired
+    private Validate validate;
     private final Map<Long, T> data = new HashMap<>();
     private Long id = 0L;
 
     public T create(@Valid @RequestBody T item) {
-        validate(item);
+        validate.validate(item);
         item.setId(++id);
         data.put(id, item);
         return item;
@@ -36,7 +41,7 @@ public abstract class AbstractController<T extends Item> {
             log.warn("Ошибка обновления id {} отсутствует в базе.", item.getId());
             throw new EmptyUserException();
         }
-        validate(item);
+        validate.validate(item);
         data.put(id, item);
         return new ResponseEntity<>(item, HttpStatus.OK);
     }
@@ -44,6 +49,4 @@ public abstract class AbstractController<T extends Item> {
     public List<T> findAll() {
         return new ArrayList<>(data.values());
     }
-
-    abstract void validate(T item);
 }
