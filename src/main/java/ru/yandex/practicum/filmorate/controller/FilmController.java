@@ -13,13 +13,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/films")
 public class FilmController extends AbstractController<Film> {
-    private boolean isValid = true;
-
     @PostMapping()
     public Film create(@Valid @RequestBody Film film) {
-        if (isValid) {
-            log.info("Фильм добавлен {}.", film);
-        }
+        log.info("Фильм добавлен {}.", film);
         return super.create(film);
     }
 

@@ -14,44 +14,45 @@ import java.util.Optional;
 @Log4j2
 @Service
 public class Validate<T> {
-    private boolean isValid = true;
 
     public void validate(T item) {
-
         if (item.getClass().equals(Film.class)) {
-            Optional<String> filmDescription = Optional.ofNullable(((Film) item).getDescription());
-            if (filmDescription.isPresent()) {
-                if (filmDescription.get().length() > 200) {
-                    log.warn("Длина описания фильма не может быть больше 200 символов.");
-                    isValid = false;
-                    throw new ValidationDescriptionSizeException();
-                }
-            }
+            filmValidate((Film) item);
+        } else if (item.getClass().equals(User.class)) {
+            userValidate((User) item);
+        }
+    }
 
-            Optional<Integer> filmDuration = Optional.ofNullable(((Film) item).getDuration());
-            if (filmDuration.isPresent()) {
-                if (filmDuration.get() < 0) {
-                    log.warn("Продолжительность фильма должна быть положительной.");
-                    isValid = false;
-                    throw new ValidationDurationException();
-                }
-            }
-
-            Optional<LocalDate> releaseDate = Optional.ofNullable(((Film) item).getReleaseDate());
-            if (releaseDate.isPresent()) {
-                if (releaseDate.get().isBefore(LocalDate.of(1895, 12, 28))) {
-                    log.warn("Дата релиза фильма раньше 28 декабря 1895 года.");
-                    isValid = false;
-                    throw new ValidationReleaseDateException();
-                }
+    private void filmValidate(Film film) {
+        Optional<String> filmDescription = Optional.ofNullable(film.getDescription());
+        if (filmDescription.isPresent()) {
+            if (filmDescription.get().length() > 200) {
+                log.warn("Длина описания фильма не может быть больше 200 символов.");
+                throw new ValidationDescriptionSizeException();
             }
         }
 
-        if (item.getClass().equals(User.class)) {
-            Optional<String> userName = Optional.ofNullable(((User) item).getName());
-            if (!userName.isPresent() || ((User) item).getName().isEmpty()) {
-                ((User) item).setName(((User) item).getLogin());
+        Optional<Integer> filmDuration = Optional.ofNullable(film.getDuration());
+        if (filmDuration.isPresent()) {
+            if (filmDuration.get() < 0) {
+                log.warn("Продолжительность фильма должна быть положительной.");
+                throw new ValidationDurationException();
             }
+        }
+
+        Optional<LocalDate> releaseDate = Optional.ofNullable(film.getReleaseDate());
+        if (releaseDate.isPresent()) {
+            if (releaseDate.get().isBefore(LocalDate.of(1895, 12, 28))) {
+                log.warn("Дата релиза фильма раньше 28 декабря 1895 года.");
+                throw new ValidationReleaseDateException();
+            }
+        }
+    }
+
+    private void userValidate(User user) {
+        Optional<String> userName = Optional.ofNullable(user.getName());
+        if (!userName.isPresent() || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
         }
     }
 }
