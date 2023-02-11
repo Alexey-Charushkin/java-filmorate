@@ -4,7 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.EmptyUserException;
+import ru.yandex.practicum.filmorate.exceptions.EmptyFilmException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.Validate;
 
@@ -35,7 +35,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         Optional<Film> oldItem = Optional.ofNullable(films.get(film.getId()));
         if (!oldItem.isPresent()) {
             log.warn("Ошибка обновления id {} отсутствует в базе.", film.getId());
-            throw new EmptyUserException();
+            throw new EmptyFilmException("Ошибка обновления фильм с id " + film.getId() + " отсутствует в базе." );
         }
         validator.validate(film);
         films.put(id, film);

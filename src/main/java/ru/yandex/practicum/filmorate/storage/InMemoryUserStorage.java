@@ -36,7 +36,8 @@ public class InMemoryUserStorage implements UserStorage {
         Optional<User> oldItem = Optional.ofNullable(users.get(user.getId()));
         if (!oldItem.isPresent()) {
             log.warn("Ошибка обновления id {} отсутствует в базе.", user.getId());
-            throw new EmptyUserException();
+            throw new EmptyUserException("Ошибка обновления. Пользователь с id " + user.getId()
+                    + " отсутствует в базе.");
         }
         validator.validate(user);
         users.put(id, user);

@@ -26,7 +26,7 @@ public class Validate<T> {
         if (releaseDate.isPresent()) {
             if (releaseDate.get().isBefore(LocalDate.of(1895, 12, 28))) {
                 log.warn("Дата релиза фильма раньше 28 декабря 1895 года.");
-                throw new ValidationReleaseDateException();
+                throw new ValidationReleaseDateException("Дата релиза фильма раньше 28 декабря 1895 года.");
             }
         }
     }

@@ -15,7 +15,6 @@ import java.util.*;
 public class UserController {
 
     private InMemoryUserStorage inMemoryUserStorage;
-
     UserController(InMemoryUserStorage inMemoryUserStorage) {
         this.inMemoryUserStorage = inMemoryUserStorage;
     }
