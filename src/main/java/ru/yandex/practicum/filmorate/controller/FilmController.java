@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -12,28 +13,29 @@ import java.util.List;
 @Log4j2
 @RestController
 @RequestMapping("/films")
-public class FilmController extends AbstractController<Film> {
+public class FilmController {
+    private InMemoryFilmStorage inMemoryFilmStorage;
+    FilmController(InMemoryFilmStorage inMemoryFilmStorage) {
+        this.inMemoryFilmStorage = inMemoryFilmStorage;
+    }
+
     @PostMapping()
     public Film create(@Valid @RequestBody Film film) {
         log.info("Фильм добавлен {}.", film);
-        return super.create(film);
+        return inMemoryFilmStorage.create(film);
     }
 
     @PutMapping()
     public ResponseEntity<?> update(@Valid @RequestBody Film film) {
-        try {
-            log.info("Фильм обновлён {}.", film);
-            return super.update(film);
-        } catch (Exception exc) {
-            log.info("Не обновлено! Фильм {} отсутствует в базе.", film.getName());
-            return new ResponseEntity<>(film, HttpStatus.NOT_FOUND);
-        }
+        log.info("Фильм обновлён {}.", film);
+        return inMemoryFilmStorage.update(film);
     }
 
     @GetMapping()
     public List<Film> findAll() {
-        List<Film> films = super.findAll();
+        List<Film> films = inMemoryFilmStorage.findAll();
         log.info("Текущее количество фильмов: {}", films.size());
         return films;
     }
+
 }

@@ -11,5 +11,6 @@ public interface FilmStorage {
     public Film create(@Valid @RequestBody Film film);
     public ResponseEntity<?> update(@Valid @RequestBody Film film);
     public Film remove();
+    public List<Film> findAll();
 
 }
