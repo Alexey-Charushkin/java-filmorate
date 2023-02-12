@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.constraints.Email;
 import java.time.LocalDate;
