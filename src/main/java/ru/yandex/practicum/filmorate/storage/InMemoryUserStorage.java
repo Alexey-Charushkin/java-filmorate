@@ -27,6 +27,7 @@ public class InMemoryUserStorage implements UserStorage {
     public User create(User user) {
         validator.validate(user);
         user.setId(++id);
+        log.info("Пользователь добавлен {}.", user);
         users.put(id, user);
         return user;
     }
@@ -40,6 +41,7 @@ public class InMemoryUserStorage implements UserStorage {
                     + " отсутствует в базе.");
         }
         validator.validate(user);
+        log.info("Пользователь обновлён {}.", user);
         users.put(id, user);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
@@ -51,6 +53,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public List<User> findAll() {
+        log.info("Текущее количество пользователей: {}", users.size());
         return new ArrayList<>(users.values());
     }
 

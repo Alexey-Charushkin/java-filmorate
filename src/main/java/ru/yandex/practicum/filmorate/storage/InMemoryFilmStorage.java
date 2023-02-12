@@ -26,6 +26,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film create(Film film) {
         validator.validate(film);
         film.setId(++id);
+        log.info("Фильм добавлен {}.", film);
         films.put(id, film);
         return film;
     }
@@ -38,6 +39,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new EmptyFilmException("Ошибка обновления фильм с id " + film.getId() + " отсутствует в базе." );
         }
         validator.validate(film);
+        log.info("Фильм обновлён {}.", film);
         films.put(id, film);
         return new ResponseEntity<>(film, HttpStatus.OK);
     }
@@ -48,6 +50,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public List<Film> findAll() {
+        log.info("Текущее количество фильмов: {}", films.size());
         return new ArrayList<>(films.values());
     }
 }

@@ -15,27 +15,23 @@ import java.util.*;
 public class UserController {
 
     private InMemoryUserStorage inMemoryUserStorage;
+
     UserController(InMemoryUserStorage inMemoryUserStorage) {
         this.inMemoryUserStorage = inMemoryUserStorage;
     }
 
     @PostMapping()
     public User create(@Valid @RequestBody User user) {
-        log.info("Пользователь добавлен {}.", user);
         return inMemoryUserStorage.create(user);
     }
 
     @PutMapping()
     public ResponseEntity<?> update(@Valid @RequestBody User user) {
-        log.info("Пользователь обновлён {}.", user);
         return inMemoryUserStorage.update(user);
-
     }
 
     @GetMapping()
     public List<User> findAll() {
-        List<User> users = inMemoryUserStorage.findAll();
-        log.info("Текущее количество пользователей: {}", users.size());
-        return users;
+        return new ArrayList<>(inMemoryUserStorage.findAll());
     }
 }

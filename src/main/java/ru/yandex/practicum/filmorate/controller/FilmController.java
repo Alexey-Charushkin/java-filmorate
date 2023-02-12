@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 @Log4j2
@@ -14,27 +15,23 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController {
     private InMemoryFilmStorage inMemoryFilmStorage;
-      FilmController(InMemoryFilmStorage inMemoryFilmStorage) {
+    FilmController(InMemoryFilmStorage inMemoryFilmStorage) {
         this.inMemoryFilmStorage = inMemoryFilmStorage;
     }
 
     @PostMapping()
     public Film create(@Valid @RequestBody Film film) {
-        log.info("Фильм добавлен {}.", film);
         return inMemoryFilmStorage.create(film);
     }
 
     @PutMapping()
     public ResponseEntity<?> update(@Valid @RequestBody Film film) {
-        log.info("Фильм обновлён {}.", film);
         return inMemoryFilmStorage.update(film);
     }
 
     @GetMapping()
     public List<Film> findAll() {
-        List<Film> films = inMemoryFilmStorage.findAll();
-        log.info("Текущее количество фильмов: {}", films.size());
-        return films;
+        return new ArrayList<>(inMemoryFilmStorage.findAll());
     }
 
 }

@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exceptions.ValidationReleaseDateException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.Validate;
@@ -67,7 +67,7 @@ class FilmorateApplicationTests {
 
     @Test
     void FilmFailFailReleaseDateValidate() throws RuntimeException {
-        assertThrows(ValidationReleaseDateException.class, () -> validate.validate(filmFailReleaseDate),
+        assertThrows(ValidationException.class, () -> validate.validate(filmFailReleaseDate),
                 "Исключение не сгенерировано.");
     }
 
