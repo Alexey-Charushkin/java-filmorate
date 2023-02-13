@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.constraints.Email;
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
@@ -18,5 +18,9 @@ public class User extends Item {
     private String name;
     @NonNull
     private LocalDate birthday;
+    private List<User> userFriends;
 
+    public void removeFriends(User user) {
+        userFriends.remove(user);
+    }
 }

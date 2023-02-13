@@ -13,7 +13,7 @@ import java.util.Map;
 public interface UserStorage {
     Map<Long, User> users = new HashMap<>();
 
-    public User getUser(Long id);
+    public User findUserById(Long id);
 
     public Map<Long, User> getUsers();
 
@@ -21,5 +21,5 @@ public interface UserStorage {
 
     public void update(User user);
 
-    public User remove();
+    public void remove(User user);
 }

@@ -15,6 +15,7 @@ import java.util.*;
 public class UserController {
 
     private UserService userService;
+
     UserController(UserService userService) {
         this.userService = userService;
     }
@@ -32,5 +33,14 @@ public class UserController {
     @GetMapping()
     public List<User> findAll() {
         return new ArrayList<>(userService.findAll());
+    }
+
+    @GetMapping("{id}")
+    public User findById(@PathVariable Long id) {
+        return userService.findById(id);
+    }
+    @PutMapping("{id}/friends/{friendId}")
+    public User addFriend(@PathVariable Long id, Long friendId) {
+        return userService.addFriend(id, friendId);
     }
 }

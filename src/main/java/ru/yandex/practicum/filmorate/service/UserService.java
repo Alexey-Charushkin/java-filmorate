@@ -33,12 +33,7 @@ public class UserService {
     }
 
     public ResponseEntity<?> update(User user) {
-        Optional<User> oldItem = Optional.ofNullable(userStorage.getUser(user.getId()));
-        if (!oldItem.isPresent()) {
-            log.warn("Ошибка обновления id {} отсутствует в базе.", user.getId());
-            throw new EmptyUserException("Ошибка обновления. Пользователь с id " + user.getId()
-                    + " отсутствует в базе.");
-        }
+        userIsPresent(user);
         validator.validate(user);
         log.info("Пользователь обновлён {}.", user);
         userStorage.update(user);
@@ -53,4 +48,47 @@ public class UserService {
         log.info("Текущее количество пользователей: {}", userStorage.getUsers().size());
         return new ArrayList<>(userStorage.getUsers().values());
     }
+
+    public User findById(Long id) {
+        userIsPresent(userStorage.findUserById(id));
+        log.info("Пользователь с id {} найден.", id);
+        return userStorage.findUserById(id);
+    }
+
+    public User addFriend(Long userId, Long friendId) {
+        User user = userIsPresent(userStorage.findUserById(id));
+        User friendUser = userIsPresent(userStorage.findUserById(id));
+        log.info("Пользователь {} добавлен в друзья к пользователю {}.", user, friendUser);
+        user.setUserFriends((List<User>) friendUser);
+        userStorage.add(user);
+        friendUser.setUserFriends((List<User>) user);
+        userStorage.add(friendUser);
+        return friendUser;
+    }
+
+    public void removeFriend(Long userId, Long friendId) {
+        User user = userIsPresent(userStorage.findUserById(id));
+        User friendUser = userIsPresent(userStorage.findUserById(id));
+        log.info("Пользователь {} удалён из друзей пользователя {}.", user, friendUser);
+        user.removeFriends(friendUser);
+        userStorage.add(user);
+        friendUser.removeFriends(user);
+        userStorage.add(friendUser);
+    }
+
+    public List<User> getFriends(Long userId) {
+        User user = userIsPresent(userStorage.findUserById(id));
+        return user.getUserFriends();
+    }
+
+    private User userIsPresent(User user) {
+        Optional<User> isUser = Optional.ofNullable(userStorage.findUserById(user.getId()));
+        if (!isUser.isPresent()) {
+            log.warn("Пользователь c id {} не найден.", user.getId());
+            throw new EmptyUserException("Пользователь с id " + user.getId()
+                    + " отсутствует в базе.");
+        }
+        return isUser.get();
+    }
+
 }

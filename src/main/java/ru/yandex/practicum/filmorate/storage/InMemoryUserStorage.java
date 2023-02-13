@@ -11,7 +11,7 @@ import java.util.*;
 public class InMemoryUserStorage implements UserStorage {
 
     @Override
-    public User getUser(Long id) {
+    public User findUserById(Long id) {
         return users.get(id);
     }
 
@@ -31,7 +31,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User remove() {
-        return null;
+    public void remove(User user) {
+        users.remove(user);
     }
 }
