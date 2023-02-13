@@ -1,12 +1,8 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.EmptyUserException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.Validate;
 
 import java.util.*;
 
@@ -14,47 +10,28 @@ import java.util.*;
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
-    private Validate validator;
-
-    InMemoryUserStorage(Validate validator) {
-        this.validator = validator;
-    }
-
-    private final Map<Long, User> users = new HashMap<>();
-    private Long id = 0L;
-
     @Override
-    public User create(User user) {
-        validator.validate(user);
-        user.setId(++id);
-        log.info("Пользователь добавлен {}.", user);
-        users.put(id, user);
-        return user;
+    public User getUser(Long id) {
+        return users.get(id);
     }
 
     @Override
-    public ResponseEntity<?> update(User user) {
-        Optional<User> oldItem = Optional.ofNullable(users.get(user.getId()));
-        if (!oldItem.isPresent()) {
-            log.warn("Ошибка обновления id {} отсутствует в базе.", user.getId());
-            throw new EmptyUserException("Ошибка обновления. Пользователь с id " + user.getId()
-                    + " отсутствует в базе.");
-        }
-        validator.validate(user);
-        log.info("Пользователь обновлён {}.", user);
-        users.put(id, user);
-        return new ResponseEntity<>(user, HttpStatus.OK);
+    public Map<Long, User> getUsers() {
+        return users;
+    }
+
+    @Override
+    public void add(User user) {
+        users.put(user.getId(), user);
+    }
+
+    @Override
+    public void update(User user) {
+        users.put(user.getId(), user);
     }
 
     @Override
     public User remove() {
         return null;
     }
-
-    @Override
-    public List<User> findAll() {
-        log.info("Текущее количество пользователей: {}", users.size());
-        return new ArrayList<>(users.values());
-    }
-
 }

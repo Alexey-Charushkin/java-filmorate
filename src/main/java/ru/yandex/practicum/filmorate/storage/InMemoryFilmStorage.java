@@ -14,34 +14,24 @@ import java.util.*;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
 
-    private Validate validator;
-    public InMemoryFilmStorage(Validate validator) {
-        this.validator = validator;
-    }
-
-    private final Map<Long, Film> films = new HashMap<>();
-    private Long id = 0L;
-
     @Override
-    public Film create(Film film) {
-        validator.validate(film);
-        film.setId(++id);
-        log.info("Фильм добавлен {}.", film);
-        films.put(id, film);
-        return film;
+    public Map<Long, Film> getFilms() {
+        return films;
     }
 
     @Override
-    public ResponseEntity<?> update(Film film) {
-        Optional<Film> oldItem = Optional.ofNullable(films.get(film.getId()));
-        if (!oldItem.isPresent()) {
-            log.warn("Ошибка обновления id {} отсутствует в базе.", film.getId());
-            throw new EmptyFilmException("Ошибка обновления фильм с id " + film.getId() + " отсутствует в базе." );
-        }
-        validator.validate(film);
-        log.info("Фильм обновлён {}.", film);
-        films.put(id, film);
-        return new ResponseEntity<>(film, HttpStatus.OK);
+    public Film getFilm(Long id) {
+        return films.get(id);
+    }
+
+    @Override
+    public void add(Film film) {
+        films.put(film.getId(), film);
+    }
+
+    @Override
+    public void update(Film film) {
+        films.put(film.getId(), film);
     }
 
     @Override
@@ -49,8 +39,5 @@ public class InMemoryFilmStorage implements FilmStorage {
         return null;
     }
 
-    public List<Film> findAll() {
-        log.info("Текущее количество фильмов: {}", films.size());
-        return new ArrayList<>(films.values());
-    }
+
 }

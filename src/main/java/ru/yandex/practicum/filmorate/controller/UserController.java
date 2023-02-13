@@ -4,7 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -14,24 +14,23 @@ import java.util.*;
 @RequestMapping("/users")
 public class UserController {
 
-    private InMemoryUserStorage inMemoryUserStorage;
-
-    UserController(InMemoryUserStorage inMemoryUserStorage) {
-        this.inMemoryUserStorage = inMemoryUserStorage;
+    private UserService userService;
+    UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @PostMapping()
     public User create(@Valid @RequestBody User user) {
-        return inMemoryUserStorage.create(user);
+        return userService.create(user);
     }
 
     @PutMapping()
     public ResponseEntity<?> update(@Valid @RequestBody User user) {
-        return inMemoryUserStorage.update(user);
+        return userService.update(user);
     }
 
     @GetMapping()
     public List<User> findAll() {
-        return new ArrayList<>(inMemoryUserStorage.findAll());
+        return new ArrayList<>(userService.findAll());
     }
 }

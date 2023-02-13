@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import javax.validation.Valid;
@@ -14,24 +15,25 @@ import java.util.List;
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    private InMemoryFilmStorage inMemoryFilmStorage;
-    FilmController(InMemoryFilmStorage inMemoryFilmStorage) {
-        this.inMemoryFilmStorage = inMemoryFilmStorage;
+    private FilmService filmService;
+
+    FilmController(FilmService filmService) {
+        this.filmService = filmService;
     }
 
     @PostMapping()
     public Film create(@Valid @RequestBody Film film) {
-        return inMemoryFilmStorage.create(film);
+        return filmService.create(film);
     }
 
     @PutMapping()
     public ResponseEntity<?> update(@Valid @RequestBody Film film) {
-        return inMemoryFilmStorage.update(film);
+        return filmService.update(film);
     }
 
     @GetMapping()
     public List<Film> findAll() {
-        return new ArrayList<>(inMemoryFilmStorage.findAll());
+        return new ArrayList<>(filmService.findAll());
     }
 
 }
