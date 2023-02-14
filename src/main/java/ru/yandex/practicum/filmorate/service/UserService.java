@@ -33,7 +33,7 @@ public class UserService {
     }
 
     public ResponseEntity<?> update(User user) {
-        userIsPresent(user);
+        userIsPresent(user.getId());
         validator.validate(user);
         log.info("Пользователь обновлён {}.", user);
         userStorage.update(user);
@@ -50,25 +50,26 @@ public class UserService {
     }
 
     public User findById(Long id) {
-        userIsPresent(userStorage.findUserById(id));
+
+           userIsPresent(id);
         log.info("Пользователь с id {} найден.", id);
         return userStorage.findUserById(id);
     }
 
     public User addFriend(Long userId, Long friendId) {
-        User user = userIsPresent(userStorage.findUserById(id));
-        User friendUser = userIsPresent(userStorage.findUserById(id));
+        User user = userIsPresent(userId);
+        User friendUser = userIsPresent(friendId);
         log.info("Пользователь {} добавлен в друзья к пользователю {}.", user, friendUser);
-        user.setUserFriends((List<User>) friendUser);
+        user.setUserFriendsId(friendId);
         userStorage.add(user);
-        friendUser.setUserFriends((List<User>) user);
+        friendUser.setUserFriendsId(userId);
         userStorage.add(friendUser);
         return friendUser;
     }
 
     public void removeFriend(Long userId, Long friendId) {
-        User user = userIsPresent(userStorage.findUserById(id));
-        User friendUser = userIsPresent(userStorage.findUserById(id));
+        User user = userIsPresent(userId);
+        User friendUser = userIsPresent(friendId);
         log.info("Пользователь {} удалён из друзей пользователя {}.", user, friendUser);
         user.removeFriends(friendUser);
         userStorage.add(user);
@@ -77,15 +78,23 @@ public class UserService {
     }
 
     public List<User> getFriends(Long userId) {
-        User user = userIsPresent(userStorage.findUserById(id));
-        return user.getUserFriends();
+        User user = userIsPresent(userId);
+        List<User> userFriends = new ArrayList<>();
+        if(user.getUserFriendsId().size() == 0) {
+            log.info("Список друзей пользователя {} пуст.", user.getName());
+        }
+        Set<Long> friendsId = new HashSet<>(user.getUserFriendsId());
+        for(Long id: friendsId) {
+            userFriends.add(userStorage.findUserById(id));
+        }
+        return userFriends;
     }
 
-    private User userIsPresent(User user) {
-        Optional<User> isUser = Optional.ofNullable(userStorage.findUserById(user.getId()));
+    private User userIsPresent(Long id) {
+        Optional<User> isUser = Optional.ofNullable(userStorage.findUserById(id));
         if (!isUser.isPresent()) {
-            log.warn("Пользователь c id {} не найден.", user.getId());
-            throw new EmptyUserException("Пользователь с id " + user.getId()
+            log.warn("Пользователь c id {} отсутствует в базе.", id);
+            throw new EmptyUserException("Пользователь с id " + id
                     + " отсутствует в базе.");
         }
         return isUser.get();

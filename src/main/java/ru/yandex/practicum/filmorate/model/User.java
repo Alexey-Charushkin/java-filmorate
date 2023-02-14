@@ -1,10 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
+import org.springframework.stereotype.Component;
 
 import javax.validation.constraints.Email;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,9 +21,13 @@ public class User extends Item {
     private String name;
     @NonNull
     private LocalDate birthday;
-    private List<User> userFriends;
+    private Set<Long> userFriendsId = new HashSet<>();
+
+    public void setUserFriendsId(Long friendsId) { userFriendsId.add(friendsId); }
+
+    public Set<Long> getUserFriendsId() { return userFriendsId; }
 
     public void removeFriends(User user) {
-        userFriends.remove(user);
+        userFriendsId.remove(user);
     }
 }
