@@ -51,7 +51,7 @@ public class UserService {
 
     public User findById(Long id) {
 
-           userIsPresent(id);
+        userIsPresent(id);
         log.info("Пользователь с id {} найден.", id);
         return userStorage.findUserById(id);
     }
@@ -67,7 +67,7 @@ public class UserService {
         return friendUser;
     }
 
-    public void removeFriend(Long userId, Long friendId) {
+    public User removeFriend(Long userId, Long friendId) {
         User user = userIsPresent(userId);
         User friendUser = userIsPresent(friendId);
         log.info("Пользователь {} удалён из друзей пользователя {}.", user, friendUser);
@@ -75,19 +75,46 @@ public class UserService {
         userStorage.add(user);
         friendUser.removeFriends(user);
         userStorage.add(friendUser);
+        return friendUser;
     }
 
     public List<User> getFriends(Long userId) {
         User user = userIsPresent(userId);
         List<User> userFriends = new ArrayList<>();
-        if(user.getUserFriendsId().size() == 0) {
+        if (user.getUserFriendsId().size() == 0) {
             log.info("Список друзей пользователя {} пуст.", user.getName());
         }
         Set<Long> friendsId = new HashSet<>(user.getUserFriendsId());
-        for(Long id: friendsId) {
+        for (Long id : friendsId) {
             userFriends.add(userStorage.findUserById(id));
         }
+        log.info("Количество друзей пользователя {} : {}.", user.getName(), userFriends.size());
         return userFriends;
+    }
+
+    public List<User> getСommonFriends(Long userId, Long friendId) {
+        User user = userIsPresent(userId);
+        User userFriend = userIsPresent(friendId);
+        if (user.getUserFriendsId().size() == 0) {
+            log.info("Список друзей пользователя {} пуст.", user.getName());
+        }
+        if (userFriend.getUserFriendsId().size() == 0) {
+            log.info("Список друзей пользователя {} пуст.", user.getName());
+        }
+        List<User> commonUserFriends = new ArrayList<>();
+
+        Set<Long> friendsIdUser = new HashSet<>(user.getUserFriendsId());
+        Set<Long> friendsIdFriend = new HashSet<>(userFriend.getUserFriendsId());
+            for (Long id : friendsIdUser) {
+                for (Long id2 : friendsIdFriend)
+                    if (id == id2) {
+                        commonUserFriends.add(userStorage.findUserById(id));
+                    }
+            }
+
+        log.info("Количество общих друзей пользователя: {} и пользователя {} : {}.",
+                user.getName(), userFriend.getName(), commonUserFriends.size());
+        return commonUserFriends;
     }
 
     private User userIsPresent(Long id) {
