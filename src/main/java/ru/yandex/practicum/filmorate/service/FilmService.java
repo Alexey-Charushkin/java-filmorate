@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.EmptyFilmException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ public class FilmService {
     FilmStorage filmStorage;
     private Validate validator;
 
+    @Autowired
     FilmService(FilmStorage filmStorage, Validate validator) {
         this.filmStorage = filmStorage;
         this.validator = validator;
@@ -54,5 +57,25 @@ public class FilmService {
         log.info("Текущее количество фильмов: {}", filmStorage.getFilms().size());
         return new ArrayList<>(filmStorage.getFilms().values());
     }
-
+    public Film findById(Long id) {
+        validator.filmIsPresent(id);
+        log.info("Фильм с id {} найден.", id);
+        return filmStorage.getFilm(id);
+    }
+    public Film addLike(Long filmId, Long userId) {
+        User user = validator.userIsPresent(userId);
+        Film film = validator.filmIsPresent(filmId);
+        log.info("Пользователь {} добавил лайк фильму {}.", user.getName(), film.getName());
+        film.setRate(film.getRate() + 1);
+        film.setUserAddLikeFilm(userId);
+        return film;
+    }
+    public Film removeLike(Long filmId, Long userId) {
+        User user = validator.userIsPresent(userId);
+        Film film = validator.filmIsPresent(filmId);
+        log.info("Пользователь {} удалил лайк фильму {}.", user.getName(), film.getName());
+        film.setRate(film.getRate() - 1);
+        film.removeUserLikeFilm(userId);
+        return film;
+    }
 }

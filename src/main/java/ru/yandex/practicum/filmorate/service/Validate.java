@@ -1,10 +1,15 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.EmptyFilmException;
+import ru.yandex.practicum.filmorate.exceptions.EmptyUserException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -12,6 +17,16 @@ import java.util.Optional;
 @Log4j2
 @Service
 public class Validate<T> {
+
+    private UserStorage userStorage;
+    private FilmStorage filmStorage;
+
+    @Autowired
+    Validate(UserStorage userStorage, FilmStorage filmStorage) {
+        this.userStorage = userStorage;
+        this.filmStorage = filmStorage;
+    }
+
     public void validate(T item) {
         if (item.getClass().equals(Film.class)) {
             filmValidate((Film) item);
@@ -60,5 +75,25 @@ public class Validate<T> {
             log.warn("Дата рождения не может быть в будущем.");
             throw new ValidationException("Дата рождения не может быть в будущем.");
         }
+    }
+
+    User userIsPresent(Long id) {
+        Optional<User> isUser = Optional.ofNullable(userStorage.findUserById(id));
+        if (!isUser.isPresent()) {
+            log.warn("Пользователь c id {} отсутствует в базе.", id);
+            throw new EmptyUserException("Пользователь с id " + id
+                    + " отсутствует в базе.");
+        }
+        return isUser.get();
+    }
+
+    Film filmIsPresent(Long id) {
+        Optional<Film> isFilm = Optional.ofNullable(filmStorage.getFilm(id));
+        if (!isFilm.isPresent()) {
+            log.warn("Фильм c id {} отсутствует в базе.", id);
+            throw new EmptyFilmException("Фильм с id " + id
+                    + " отсутствует в базе.");
+        }
+        return isFilm.get();
     }
 }

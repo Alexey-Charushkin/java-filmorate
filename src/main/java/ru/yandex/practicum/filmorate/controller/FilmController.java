@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
@@ -34,6 +35,19 @@ public class FilmController {
     @GetMapping()
     public List<Film> findAll() {
         return new ArrayList<>(filmService.findAll());
+    }
+    @GetMapping("{id}")
+    public Film findById(@PathVariable Long id) {
+        return filmService.findById(id);
+    }
+
+    @PutMapping("{id}/like/{userId}")
+    public Film addLike(@PathVariable Long id, @PathVariable Long userId) {
+        return filmService.addLike(id, userId);
+    }
+    @DeleteMapping("{id}/like/{userId}")
+    public Film removeLike(@PathVariable Long id, @PathVariable Long userId) {
+        return filmService.removeLike(id, userId);
     }
 
 }
