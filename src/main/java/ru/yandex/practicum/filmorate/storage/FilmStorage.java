@@ -9,14 +9,12 @@ public interface FilmStorage {
 
     Map<Long, Film> films = new HashMap<>();
 
-    public Film getFilm(Long id);
+    Film getFilm(Long id);
 
-    public Map<Long, Film> getFilms();
+    Map<Long, Film> getFilms();
 
-    public void add(Film film);
+    void add(Film film);
 
-    public void update(Film film);
-
-    public Film remove();
+    void update(Film film);
 
 }

@@ -1,10 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.EmptyUserException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -14,9 +14,10 @@ import java.util.*;
 @Service
 public class UserService {
 
-    private Validate validator;
-    private UserStorage userStorage;
+    private final Validate validator;
+    private final UserStorage userStorage;
 
+    @Autowired
     UserService(Validate validator, UserStorage userStorage) {
         this.validator = validator;
         this.userStorage = userStorage;
@@ -38,10 +39,6 @@ public class UserService {
         log.info("Пользователь обновлён {}.", user);
         userStorage.update(user);
         return new ResponseEntity<>(user, HttpStatus.OK);
-    }
-
-    public User remove() {
-        return null;
     }
 
     public List<User> findAll() {
@@ -103,7 +100,7 @@ public class UserService {
         Set<Long> friendsIdFriend = new HashSet<>(userFriend.getUserFriendsId());
         for (Long id : friendsIdUser) {
             for (Long id2 : friendsIdFriend)
-                if (id == id2) {
+                if (id.equals(id2)) {
                     commonUserFriends.add(userStorage.findUserById(id));
                 }
         }

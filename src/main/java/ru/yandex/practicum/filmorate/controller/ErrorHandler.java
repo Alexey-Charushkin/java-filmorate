@@ -16,19 +16,22 @@ public class ErrorHandler {
     public ErrorResponse handleEmptyFilmException(final EmptyFilmException e) {
         return new ErrorResponse(e.getMessage());
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleEmptyUserException(final EmptyUserException e) {
         return new ErrorResponse(e.getMessage());
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleValidationException(final ValidationException e) {
         return new ErrorResponse(e.getMessage());
     }
-//    @ExceptionHandler
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    public ErrorResponse handleThrows(final Throwable e) {
-//        return new ErrorResponse("Произошла непредвиденная ошибка.");
-//    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleThrows(final Throwable e) {
+        return new ErrorResponse("Произошла непредвиденная ошибка.");
+    }
 }

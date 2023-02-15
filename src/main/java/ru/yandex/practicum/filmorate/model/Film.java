@@ -23,9 +23,10 @@ public class Film extends Item {
 
     private Integer rate = 0;
     private Set<Long> userFilmLikes = new HashSet<>();
-    public void setUserAddLikeFilm(Long userId) { userFilmLikes.add(userId); }
 
-    public Set<Long> getUserFilmLikes() { return userFilmLikes; }
+    public void setUserAddLikeFilm(Long userId) {
+        userFilmLikes.add(userId);
+    }
 
     public void removeUserLikeFilm(Long userId) {
         userFilmLikes.remove(userId);

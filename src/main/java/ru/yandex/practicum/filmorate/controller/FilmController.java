@@ -4,9 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
@@ -16,7 +14,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    private FilmService filmService;
+    private final FilmService filmService;
 
     FilmController(FilmService filmService) {
         this.filmService = filmService;
@@ -36,6 +34,7 @@ public class FilmController {
     public List<Film> findAll() {
         return new ArrayList<>(filmService.findAll());
     }
+
     @GetMapping("{id}")
     public Film findById(@PathVariable Long id) {
         return filmService.findById(id);
@@ -45,12 +44,13 @@ public class FilmController {
     public Film addLike(@PathVariable Long id, @PathVariable Long userId) {
         return filmService.addLike(id, userId);
     }
+
     @DeleteMapping("{id}/like/{userId}")
     public Film removeLike(@PathVariable Long id, @PathVariable Long userId) {
         return filmService.removeLike(id, userId);
     }
 
-   @GetMapping("popular")
+    @GetMapping("popular")
     public List<Film> findFilmsByRate(@RequestParam(required = false, defaultValue = "10") Integer count) {
         return new ArrayList<>(filmService.filmsPopular(count));
     }

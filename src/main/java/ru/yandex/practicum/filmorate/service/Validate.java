@@ -18,8 +18,8 @@ import java.util.Optional;
 @Service
 public class Validate<T> {
 
-    private UserStorage userStorage;
-    private FilmStorage filmStorage;
+    private final UserStorage userStorage;
+    private final FilmStorage filmStorage;
 
     @Autowired
     Validate(UserStorage userStorage, FilmStorage filmStorage) {

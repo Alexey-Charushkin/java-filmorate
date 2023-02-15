@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 @Log4j2
 @Service
 public class FilmService {
-    FilmStorage filmStorage;
-    private Validate validator;
+    private final FilmStorage filmStorage;
+    private final Validate validator;
 
     @Autowired
     FilmService(FilmStorage filmStorage, Validate validator) {
@@ -49,10 +49,6 @@ public class FilmService {
         log.info("Фильм обновлён {}.", film);
         filmStorage.update(film);
         return new ResponseEntity<>(film, HttpStatus.OK);
-    }
-
-    public Film remove() {
-        return null;
     }
 
     public List<Film> findAll() {
@@ -85,18 +81,11 @@ public class FilmService {
     }
 
     public List<Film> filmsPopular(Integer count) {
-        Integer countFilms = count;
-        List<Film> filmsByRate = filmStorage.getFilms().values().stream()
+        return filmStorage.getFilms().values().stream()
                 .sorted(comparator)
-                .limit(countFilms)
+                .limit(count)
                 .collect(Collectors.toList());
-        return filmsByRate;
     }
 
-    Comparator<Film> comparator = new Comparator<Film>() {
-        @Override
-        public int compare(Film o1, Film o2) {
-            return o2.getRate() - o1.getRate();
-        }
-    };
+    Comparator<Film> comparator = (o1, o2) -> o2.getRate() - o1.getRate();
 }
