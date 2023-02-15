@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -78,4 +79,14 @@ public class FilmService {
         film.removeUserLikeFilm(userId);
         return film;
     }
+    public List<Film> filmsPopular(Integer count) {
+        Integer countFilms = count;
+        if(countFilms == null) countFilms = 10;
+        List <Film> filmsByRate = filmStorage.getFilms().values().stream()
+                .sorted()
+                .limit(countFilms)
+                .collect(Collectors.toList());
+        return filmsByRate;
+    }
+
 }
