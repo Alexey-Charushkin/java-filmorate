@@ -61,9 +61,7 @@ public class UserService {
         User friendUser = validator.userIsPresent(friendId);
         log.info("Пользователь {} добавлен в друзья к пользователю {}.", user, friendUser);
         user.setUserFriendsId(friendId);
-        userStorage.add(user);
         friendUser.setUserFriendsId(userId);
-        userStorage.add(friendUser);
         return friendUser;
     }
 
@@ -72,9 +70,7 @@ public class UserService {
         User friendUser = validator.userIsPresent(friendId);
         log.info("Пользователь {} удалён из друзей пользователя {}.", user, friendUser);
         user.removeFriends(friendUser);
-        userStorage.add(user);
         friendUser.removeFriends(user);
-        userStorage.add(friendUser);
         return friendUser;
     }
 
@@ -111,7 +107,6 @@ public class UserService {
                     commonUserFriends.add(userStorage.findUserById(id));
                 }
         }
-
         log.info("Количество общих друзей пользователя: {} и пользователя {} : {}.",
                 user.getName(), userFriend.getName(), commonUserFriends.size());
         return commonUserFriends;
