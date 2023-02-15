@@ -51,7 +51,7 @@ public class FilmController {
     }
 
    @GetMapping("popular")
-    public List<Film> findFilmsByRate(@PathVariable(required = false) Integer count) {
+    public List<Film> findFilmsByRate(@RequestParam(required = false, defaultValue = "10") Integer count) {
         return new ArrayList<>(filmService.filmsPopular(count));
     }
 

@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -58,11 +59,13 @@ public class FilmService {
         log.info("Текущее количество фильмов: {}", filmStorage.getFilms().size());
         return new ArrayList<>(filmStorage.getFilms().values());
     }
+
     public Film findById(Long id) {
         validator.filmIsPresent(id);
         log.info("Фильм с id {} найден.", id);
         return filmStorage.getFilm(id);
     }
+
     public Film addLike(Long filmId, Long userId) {
         User user = validator.userIsPresent(userId);
         Film film = validator.filmIsPresent(filmId);
@@ -71,6 +74,7 @@ public class FilmService {
         film.setUserAddLikeFilm(userId);
         return film;
     }
+
     public Film removeLike(Long filmId, Long userId) {
         User user = validator.userIsPresent(userId);
         Film film = validator.filmIsPresent(filmId);
@@ -79,14 +83,20 @@ public class FilmService {
         film.removeUserLikeFilm(userId);
         return film;
     }
+
     public List<Film> filmsPopular(Integer count) {
         Integer countFilms = count;
-        if(countFilms == null) countFilms = 10;
-        List <Film> filmsByRate = filmStorage.getFilms().values().stream()
-                .sorted()
+        List<Film> filmsByRate = filmStorage.getFilms().values().stream()
+                .sorted(comparator)
                 .limit(countFilms)
                 .collect(Collectors.toList());
         return filmsByRate;
     }
 
+    Comparator<Film> comparator = new Comparator<Film>() {
+        @Override
+        public int compare(Film o1, Film o2) {
+            return o2.getRate() - o1.getRate();
+        }
+    };
 }
