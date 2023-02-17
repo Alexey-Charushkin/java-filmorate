@@ -12,6 +12,7 @@ import java.util.Set;
 @Setter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
 @RequiredArgsConstructor
 public class User extends Item {
     @Email private String email;
