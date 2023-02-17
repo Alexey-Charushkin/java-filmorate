@@ -10,7 +10,7 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString
-@NoArgsConstructor
+//@NoArgsConstructor
 //@AllArgsConstructor
 @RequiredArgsConstructor
 public class Film extends Item {
