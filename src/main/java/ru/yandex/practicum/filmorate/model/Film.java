@@ -10,9 +10,8 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString
-//@NoArgsConstructor
-//@AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
 public class Film extends Item {
 
     private String name;
