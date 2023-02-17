@@ -11,8 +11,8 @@ import java.util.Set;
 @Setter
 @ToString
 @NoArgsConstructor
-@AllArgsConstructor
-//@RequiredArgsConstructor
+//@AllArgsConstructor
+@RequiredArgsConstructor
 public class Film extends Item {
 
     private String name;
