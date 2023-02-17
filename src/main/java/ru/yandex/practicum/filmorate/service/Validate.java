@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,16 +17,11 @@ import java.util.Optional;
 
 @Log4j2
 @Service
+@RequiredArgsConstructor
 public class Validate<T> {
 
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
-
-    @Autowired
-    Validate(UserStorage userStorage, FilmStorage filmStorage) {
-        this.userStorage = userStorage;
-        this.filmStorage = filmStorage;
-    }
 
     public void validate(T item) {
         if (item.getClass().equals(Film.class)) {

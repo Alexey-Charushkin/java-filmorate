@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.validation.constraints.Email;
@@ -12,14 +13,15 @@ import java.util.Set;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class User extends Item {
-    @Email
-    private String email;
-    private String login;
-    private String name;
-    @NonNull
-    private LocalDate birthday;
-    private Set<Long> userFriendsId = new HashSet<>();
+    @Email String email;
+    String login;
+    String name;
+    @NonNull LocalDate birthday;
+
+    @JsonIgnore
+    Set<Long> userFriendsId = new HashSet<>();
 
     public void setUserFriendsId(Long friendsId) {
         userFriendsId.add(friendsId);
