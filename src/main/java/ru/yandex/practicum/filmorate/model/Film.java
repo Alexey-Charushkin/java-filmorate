@@ -10,17 +10,16 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString
-@AllArgsConstructor
 @RequiredArgsConstructor
 public class Film extends Item {
 
-    String name;
-    String description;
-    LocalDate releaseDate;
-    Integer duration;
-    Integer rate = 0;
+    private String name;
+    private String description;
+    private LocalDate releaseDate;
+    private Integer duration;
+    private Integer rate = 0;
     @JsonIgnore
-    Set<Long> userFilmLikes = new HashSet<>();
+    private Set<Long> userFilmLikes = new HashSet<>();
 
     public void setUserAddLikeFilm(Long userId) {
         userFilmLikes.add(userId);
