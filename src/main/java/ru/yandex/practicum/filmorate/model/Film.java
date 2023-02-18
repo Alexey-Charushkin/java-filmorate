@@ -1,11 +1,11 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -13,12 +13,20 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Film extends Item {
-    @NonNull
-    @NotBlank(message = "Название фильма не может быть пустым.")
+
     private String name;
-    @Size(max = 200, message = "Длина описания фильма не может быть больше 200 символов.")
     private String description;
     private LocalDate releaseDate;
-    @Positive(message = "Продолжительность фильма должна быть положительной.")
     private Integer duration;
+    private Integer rate = 0;
+    @JsonIgnore
+    private Set<Long> userFilmLikes = new HashSet<>();
+
+    public void setUserAddLikeFilm(Long userId) {
+        userFilmLikes.add(userId);
+    }
+
+    public void removeUserLikeFilm(Long userId) {
+        userFilmLikes.remove(userId);
+    }
 }

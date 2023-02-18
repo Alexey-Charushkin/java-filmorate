@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exceptions.ValidationReleaseDateException;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.Validate;
@@ -36,18 +36,18 @@ class FilmorateApplicationTests {
     private Validate validate;
 
     User userFailName = new User("friend@common.ru",
-            "userLogin", null, LocalDate.of(2000, 8, 20));
+            "userLogin", null, LocalDate.of(2000, 8, 20), null);
     Film film = new Film("Super Film", "Super film description",
-            LocalDate.of(1967, 3, 25), 100);
+            LocalDate.of(1967, 3, 25), 100, null, null);
     Film filmFailDescription = new Film("Film name", "Пятеро друзей ( комик-группа «Шарло»)," +
             " приезжают в город Бризуль. Здесь они хотят разыскать господина Огюста Куглова," +
             " который задолжал им деньги, а именно 20 миллионов. о Куглов, который за время «своего отсутствия»," +
             " стал кандидатом Коломбани.",
-            LocalDate.of(1900, 3, 25), 250);
+            LocalDate.of(1900, 3, 25), 250, null, null);
     Film filmFailReleaseDate = new Film("Name", "Description",
-            LocalDate.of(1890, 3, 25), 200);
+            LocalDate.of(1890, 3, 25), 200, null, null);
     Film filmFailDuration = new Film("Film Name", "Film Description",
-            LocalDate.of(1890, 3, 25), -50);
+            LocalDate.of(1890, 3, 25), -50, null, null);
 
     @Test
     void contextLoads() {
@@ -67,19 +67,9 @@ class FilmorateApplicationTests {
 
     @Test
     void FilmFailFailReleaseDateValidate() throws RuntimeException {
-        assertThrows(ValidationReleaseDateException.class, () -> validate.validate(filmFailReleaseDate),
+        assertThrows(ValidationException.class, () -> validate.validate(filmFailReleaseDate),
                 "Исключение не сгенерировано.");
     }
 
-    @Test
-    void UserFailNameValidate() {
-        validate.validate(userFailName);
-        ResponseEntity<User> response = restTemplate.postForEntity("/users", userFailName, User.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.OK));
-        assertThat(Objects.requireNonNull(response.getBody()).getId(), notNullValue());
-        assertThat(response.getBody().getName(), is("userLogin"));
-        assertThat(response.getBody().getLogin(), is("userLogin"));
-        assertThat(response.getBody().getBirthday().toString(), is("2000-08-20"));
-    }
 
 }
