@@ -20,7 +20,7 @@ public class Film extends Item {
     private Integer duration;
     private Integer rate = 0;
     private Genre genre;
-    private MPARating rating;
+    private MPARating mpaRating;
 
     @JsonIgnore
     private Set<Long> userFilmLikes = new HashSet<>();
