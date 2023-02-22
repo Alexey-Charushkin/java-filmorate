@@ -36,18 +36,18 @@ class FilmorateApplicationTests {
     private Validate validate;
 
     User userFailName = new User("friend@common.ru",
-            "userLogin", null, LocalDate.of(2000, 8, 20), null);
+            "userLogin", null, LocalDate.of(2000, 8, 20), null, null);
     Film film = new Film("Super Film", "Super film description",
-            LocalDate.of(1967, 3, 25), 100, null, null);
+            LocalDate.of(1967, 3, 25), 100, null, null, null, null);
     Film filmFailDescription = new Film("Film name", "Пятеро друзей ( комик-группа «Шарло»)," +
             " приезжают в город Бризуль. Здесь они хотят разыскать господина Огюста Куглова," +
             " который задолжал им деньги, а именно 20 миллионов. о Куглов, который за время «своего отсутствия»," +
             " стал кандидатом Коломбани.",
-            LocalDate.of(1900, 3, 25), 250, null, null);
+            LocalDate.of(1900, 3, 25), 250, null, null, null,null);
     Film filmFailReleaseDate = new Film("Name", "Description",
-            LocalDate.of(1890, 3, 25), 200, null, null);
+            LocalDate.of(1890, 3, 25), 200, null, null, null, null);
     Film filmFailDuration = new Film("Film Name", "Film Description",
-            LocalDate.of(1890, 3, 25), -50, null, null);
+            LocalDate.of(1890, 3, 25), -50, null, null, null, null);
 
     @Test
     void contextLoads() {

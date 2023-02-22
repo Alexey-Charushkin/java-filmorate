@@ -19,6 +19,9 @@ public class Film extends Item {
     private LocalDate releaseDate;
     private Integer duration;
     private Integer rate = 0;
+    private Genre genre;
+    private MPARating rating;
+
     @JsonIgnore
     private Set<Long> userFilmLikes = new HashSet<>();
 
