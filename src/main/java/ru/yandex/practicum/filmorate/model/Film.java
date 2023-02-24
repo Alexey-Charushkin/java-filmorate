@@ -5,6 +5,8 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
+
 import java.util.Set;
 
 @Getter
@@ -18,9 +20,9 @@ public class Film extends Item {
     private String description;
     private LocalDate releaseDate;
     private Integer duration;
-    private Integer rate = 0;
-    private Genre genre;
     private MPARating mpaRating;
+    private List<String> genreNames;
+    private Integer rate = 0;
 
     @JsonIgnore
     private Set<Long> userFilmLikes = new HashSet<>();
