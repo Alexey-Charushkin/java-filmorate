@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate;
 
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
@@ -14,9 +16,11 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.Validate;
+import ru.yandex.practicum.filmorate.storage.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
@@ -25,6 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureTestDatabase
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 class FilmorateApplicationTests {
     @Autowired
     private TestRestTemplate restTemplate;
@@ -32,6 +38,7 @@ class FilmorateApplicationTests {
     private FilmController filmController;
     @Autowired
     private UserController userController;
+    private final UserDbStorage userStorage;
     @Autowired
     private Validate validate;
 
@@ -43,7 +50,7 @@ class FilmorateApplicationTests {
             " приезжают в город Бризуль. Здесь они хотят разыскать господина Огюста Куглова," +
             " который задолжал им деньги, а именно 20 миллионов. о Куглов, который за время «своего отсутствия»," +
             " стал кандидатом Коломбани.",
-            LocalDate.of(1900, 3, 25), 250, null, null, null,null);
+            LocalDate.of(1900, 3, 25), 250, null, null, null, null);
     Film filmFailReleaseDate = new Film("Name", "Description",
             LocalDate.of(1890, 3, 25), 200, null, null, null, null);
     Film filmFailDuration = new Film("Film Name", "Film Description",
@@ -71,5 +78,16 @@ class FilmorateApplicationTests {
                 "Исключение не сгенерировано.");
     }
 
+    // новые тесты -----------------------------------------------------------------------------------
+//    @Test
+//    public void testFindUserById() {
 
+//        Optional<User> userOptional = userStorage.findUserById(1);
+//
+//        assertThat(userOptional)
+//                .isPresent()
+//                .hasValueSatisfying(user ->
+//                        assertThat(user).hasFieldOrPropertyWithValue("id", 1)
+//                );
+//    }
 }
