@@ -10,5 +10,10 @@ import org.springframework.stereotype.Component;
 @Setter
 @RequiredArgsConstructor
 class FriendStatus {
-    private String friendStatus;
+    private String friendName;
+    private FriendStatuses friendStatus;
+
 }
+
+enum FriendStatuses {НЕПОДТВЕРЖДЁННАЯ, ПОДТВЕРЖДЁННАЯ}
+

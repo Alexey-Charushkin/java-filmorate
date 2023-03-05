@@ -21,7 +21,7 @@ public class Film extends Item {
     private LocalDate releaseDate;
     private Integer duration;
     private MPARating mpaRating;
-    private List<String> genreNames;
+    private List<Genre> genres;
     private Integer rate = 0;
 
     @JsonIgnore

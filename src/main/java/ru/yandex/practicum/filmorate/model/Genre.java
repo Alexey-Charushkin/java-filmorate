@@ -10,5 +10,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @RequiredArgsConstructor
 class Genre {
-    private String nameGenre;
+    private Genres genre;
 }
+
+enum Genres {КОИЕДИЯ, ДРАМА, МУЛЬТФИЛЬМ, ТРИЛЛЕР, ДОКУМЕНТАЛЬНЫЙ, БОЕВИК}

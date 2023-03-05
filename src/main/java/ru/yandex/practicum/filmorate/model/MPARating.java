@@ -11,4 +11,5 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 class MPARating {
     private String filmMPARating;
+ //   enum filmMPARatings {G, PG, PG-13, R, NC-17}
 }
