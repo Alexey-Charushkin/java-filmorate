@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -31,17 +33,34 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void add(User user) {
-        users.put(user.getId(), user);
+        String email = user.getEmail();
+        String login = user.getLogin();
+        String nickName = user.getName();
+        String localDate = user.getBirthday().toString();
+
+//        String sql = "INSERT INTO users (email, login, user_name, birthdate) VALUES (user.getEmail(), user.getLogin()," +
+//                " user.getName();, user.getBirthday().toString())";
+//        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(dataSource)
+//                .withTableName("USES")
+//                .usingGeneratedKeyColumns("USER_ID");
+//
+//        Number id = simpleJdbcInsert.executeAndReturnKey(parameters);
+//        System.out.println("Generated id - " + id.longValue());
+
+        jdbcTemplate.update("INSERT INTO USERS VALUES (?, ?, ?, ?, ?)",1, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday().toString());
+
+    //        return jdbcTemplate.update("INSERT INTO EMPLOYEE VALUES (?, ?, ?, ?)", id, "Bill", "Gates", "USA");
+
+//        String sql = "INSERT INTO users (email, login, user_name, birthdate) VALUES ('mail@mail.ru', 'dolore', 'Nick Name', '1946-08-20')";
+//        users.put(user.getId(), user);
+//
+//        Statement statement = conn.createStatement();
+//        int rows = statement.executeUpdate("INSERT Products(ProductName, Price) VALUES ('iPhone X', 76000)," +
+//                "('Galaxy S9', 45000), ('Nokia 9', 36000)");
+//        System.out.printf("Added %d rows", rows);
     }
 
-//    private Post makePost(User user, ResultSet rs) throws SQLException {
-//
-//        Integer id = rs.getInt("id");
-//        String description = rs.getString("description");
-//        String photoUrl = rs.getString("photo_url");
-//        LocalDate creationDate = rs.getDate("creation_date").toLocalDate();
-//        return new Post(id, user, description, photoUrl, creationDate);
-//    }
+
 //    @Override
 //    public Collection<Post> findPostByUser(User user) {
 //
@@ -49,9 +68,19 @@ public class UserDbStorage implements UserStorage {
 //
 //        return jdbcTemplate.query(sql, (rs, rowNum) -> makePost(user, rs), user.getId());
 //    }
+
+    //    private Post makePost(User user, ResultSet rs) throws SQLException {
+//
+//        Integer id = rs.getInt("id");
+//        String description = rs.getString("description");
+//        String photoUrl = rs.getString("photo_url");
+//        LocalDate creationDate = rs.getDate("creation_date").toLocalDate();
+//        return new Post(id, user, description, photoUrl, creationDate);
+//    }
+
     @Override
     public void update(User user) {
-        users.put(user.getId(), user);
+      //  users.put(user.getId(), user);
     }
 
     @Override

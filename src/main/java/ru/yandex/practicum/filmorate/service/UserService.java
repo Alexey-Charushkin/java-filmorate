@@ -25,14 +25,14 @@ public class UserService {
 
     public User create(User user) {
         validator.validate(user);
-        user.setId(++id);
+     //   user.setId(++id);
         log.info("Пользователь добавлен {}.", user);
-        userStorage.add(user);
+       userStorage.add(user);
         return user;
     }
 
     public ResponseEntity<?> update(User user) {
-        validator.userIsPresent(user.getId());
+       // validator.userIsPresent(user.getId());
         validator.validate(user);
         log.info("Пользователь обновлён {}.", user);
         userStorage.update(user);

@@ -22,12 +22,12 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void add(User user) {
-        users.put(user.getId(), user);
+       // users.put(user.getId(), user);
     }
 
     @Override
     public void update(User user) {
-        users.put(user.getId(), user);
+   //     users.put(user.getId(), user);
     }
 
     @Override
