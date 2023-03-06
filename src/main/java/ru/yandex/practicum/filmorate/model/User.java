@@ -15,21 +15,22 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class User {
+public class User extends Item {
     @Email
     private String email;
     private String login;
     private String name;
     @NonNull
     private LocalDate birthday;
+
     private List<FriendStatus> friendStatuses;
 
-    public User(String email, String login, String name, @NonNull LocalDate birthday) {
-        this.email = email;
-        this.login = login;
-        this.name = name;
-        this.birthday = birthday;
-    }
+//    public User(String email, String login, String name, @NonNull LocalDate birthday) {
+//        this.email = email;
+//        this.login = login;
+//        this.name = name;
+//        this.birthday = birthday;
+//    }
 
     @JsonIgnore
     private Set<Long> userFriendsId = new HashSet<>();
