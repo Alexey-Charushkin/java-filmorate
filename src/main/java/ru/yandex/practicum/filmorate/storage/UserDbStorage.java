@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
@@ -14,12 +15,14 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 @Component("UserDbStorage")
 @Primary
 @RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
 
+    Integer id = 0;
     private final JdbcTemplate jdbcTemplate;
     @Override
     public User findUserById(Long id) {
@@ -47,8 +50,14 @@ public class UserDbStorage implements UserStorage {
 //        Number id = simpleJdbcInsert.executeAndReturnKey(parameters);
 //        System.out.println("Generated id - " + id.longValue());
 
-        jdbcTemplate.update("INSERT INTO USERS VALUES (?, ?, ?, ?, ?)",1, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday().toString());
+       GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
 
+        ResultSet rs;
+
+        jdbcTemplate.update("INSERT INTO USERS VALUES (?, ?, ?, ?, ?)", user, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday().toString()).usingGeneratedKeyColumns("ID");
+
+//        Integer idOpt = generatedKeyHolder.getKey().intValue();
+//        id = idOpt;
     //        return jdbcTemplate.update("INSERT INTO EMPLOYEE VALUES (?, ?, ?, ?)", id, "Bill", "Gates", "USA");
 
 //        String sql = "INSERT INTO users (email, login, user_name, birthdate) VALUES ('mail@mail.ru', 'dolore', 'Nick Name', '1946-08-20')";
