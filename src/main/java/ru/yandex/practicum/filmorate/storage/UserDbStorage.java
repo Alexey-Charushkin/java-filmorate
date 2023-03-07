@@ -1,21 +1,22 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
+import org.springframework.jdbc.datasource.AbstractDataSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
 
+import javax.sql.DataSource;
 import javax.xml.transform.Result;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Map;
@@ -24,11 +25,16 @@ import java.util.Optional;
 @Component("UserDbStorage")
 @Primary
 @RequiredArgsConstructor
+@Log4j2
 public class UserDbStorage implements UserStorage {
 
-    Integer id = 0;
-    private final JdbcTemplate jdbcTemplate;
-    NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private Long id;
+    private DataSource dataSource;
+    @Autowired
+    public UserDbStorage(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
     @Override
     public User findUserById(Long id) {
         return users.get(id);
@@ -41,74 +47,37 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void add(User user) {
-        String email = user.getEmail();
-        String login = user.getLogin();
-        String nickName = user.getName();
-        String localDate = user.getBirthday().toString();
 
+        GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
 
-//        SimpleJdbcInsert simpleJdbcInsert = new SimpleJdbcInsert(jdbcTemplate)
-//                .withTableName("USES")
-//                .usingGeneratedKeyColumns("USER_ID");
-//
-//        Number id = simpleJdbcInsert.executeAndReturnKey();
-//        System.out.println("Generated id - " + id.longValue());
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
 
+        String sql = "INSERT INTO `USERS`(`email`, `login`, `user_name`, `birthdate`) VALUES(?, ?, ?, ?);";
 
-//        String INSERT_MESSAGE_SQL
-//                = "INSERT INTO USERS VALUES (user_id, EMAIL, LOGIN, USER_NAME, BIRTHDATE)", 0, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday().toString();
-//        final String SQL = "INSERT INTO ... RETUNING id";
-//
-//            KeyHolder keyHolder = new GeneratedKeyHolder();
-//
-//            jdbcTemplate.update(connection -> {
-//                PreparedStatement ps = connection
-//                        .prepareStatement(INSERT_MESSAGE_SQL, Statement.RETURN_GENERATED_KEYS);
-//                               return ps;
-//            }, keyHolder);
-//
-//             keyHolder.getKey();
-//        }
-  //  }
+        int rowsAffected =
+                jdbcTemplate.update(conn -> {
 
-        KeyHolder keyHolder = new GeneratedKeyHolder();
+                    PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-        user.setId((long) id);
-//.usingGeneratedKeyColumns("ID")
+                    preparedStatement.setString(1, user.getEmail());
+                    preparedStatement.setString(2, user.getLogin());
+                    preparedStatement.setString(3, user.getName());
+                    preparedStatement.setObject(4, user.getBirthday());
 
-    jdbcTemplate.update("INSERT INTO USERS VALUES (?, ?, ?, ?, ?)", id , user.getEmail(), user.getLogin(), user.getName(), user.getBirthday().toString());
-      id = Statement.RETURN_GENERATED_KEYS;
-//        Integer idOpt = generatedKeyHolder.getKey().intValue();
-//        id = idOpt;
-    //        return jdbcTemplate.update("INSERT INTO EMPLOYEE VALUES (?, ?, ?, ?)", id, "Bill", "Gates", "USA");
+                    return preparedStatement;
 
-//        Statement statement = conn.createStatement();
-//        int rows = statement.executeUpdate("INSERT Products(ProductName, Price) VALUES ('iPhone X', 76000)," +
-//                "('Galaxy S9', 45000), ('Nokia 9', 36000)");
-//        System.out.printf("Added %d rows", rows);
+                }, generatedKeyHolder);
+
+        id = (long) generatedKeyHolder.getKey().intValue();
+        user.setId(id);
+
+        log.info("rowsAffected = {}, id={}", rowsAffected, id);
+        log.info("Пользователь добавлен {}.", user);
     }
-
-
-//    @Override
-//    public Collection<Post> findPostByUser(User user) {
-//
-//        String sql = "select * from cat_post where author_id = ? order by creation_date desc";
-//
-//        return jdbcTemplate.query(sql, (rs, rowNum) -> makePost(user, rs), user.getId());
-//    }
-
-    //    private Post makePost(User user, ResultSet rs) throws SQLException {
-//
-//        Integer id = rs.getInt("id");
-//        String description = rs.getString("description");
-//        String photoUrl = rs.getString("photo_url");
-//        LocalDate creationDate = rs.getDate("creation_date").toLocalDate();
-//        return new Post(id, user, description, photoUrl, creationDate);
-//    }
 
     @Override
     public void update(User user) {
-      //  users.put(user.getId(), user);
+        //  users.put(user.getId(), user);
     }
 
     @Override

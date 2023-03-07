@@ -26,7 +26,7 @@ public class UserService {
     public User create(User user) {
         validator.validate(user);
      //   user.setId(++id);
-        log.info("Пользователь добавлен {}.", user);
+
        userStorage.add(user);
         return user;
     }
