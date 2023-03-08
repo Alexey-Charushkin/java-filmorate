@@ -97,7 +97,7 @@ public class UserDbStorage implements UserStorage {
     public void remove(Long id) {
         jdbcTemplate.update("DELETE FROM users where user_id = ?",
                 id);
-       // jdbcTemplate.update("ALTER TABLE users alter column USER_ID restart  with id");
+        jdbcTemplate.update("ALTER TABLE users alter column USER_ID restart  with ?",id);
         log.info("Пользователь с id {} удалён.", id);
     }
 
