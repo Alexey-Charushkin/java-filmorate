@@ -25,29 +25,25 @@ public class UserService {
 
     public User create(User user) {
         validator.validate(user);
-     //   user.setId(++id);
-
-       userStorage.add(user);
+        userStorage.add(user);
         return user;
     }
 
     public ResponseEntity<?> update(User user) {
-       // validator.userIsPresent(user.getId());
+        validator.userIsPresent(user.getId());
         validator.validate(user);
-        log.info("Пользователь обновлён {}.", user);
         userStorage.update(user);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     public List<User> findAll() {
         log.info("Текущее количество пользователей: {}", userStorage.getUsers().size());
-        return new ArrayList<>(userStorage.getUsers().values());
+        return userStorage.getUsers();
     }
 
     public User findById(Long id) {
 
         validator.userIsPresent(id);
-        log.info("Пользователь с id {} найден.", id);
         return userStorage.findUserById(id);
     }
 
@@ -67,6 +63,11 @@ public class UserService {
         user.removeFriends(friendUser);
         friendUser.removeFriends(user);
         return friendUser;
+    }
+
+    public void removeUserById(Long userId) {
+        User user = validator.userIsPresent(userId);
+        userStorage.remove(userId);
     }
 
     public List<User> getFriends(Long userId) {
@@ -99,7 +100,7 @@ public class UserService {
         log.info("Список общих друзей пользователя {} и пользователя {} получен.",
                 user.getName(), userFriend.getName());
         return friendsIdUser.stream()
-                .filter(friendsIdFriend ::contains)
+                .filter(friendsIdFriend::contains)
                 .map(userId -> userStorage.findUserById(userId))
                 .collect(Collectors.toList());
     }

@@ -16,8 +16,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Map<Long, User> getUsers() {
-        return users;
+    public List<User> getUsers() {
+        return (List<User>) users;
     }
 
     @Override
@@ -31,7 +31,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void remove(User user) {
-        users.remove(user);
+    public void remove(Long id) {
+        users.remove(id);
     }
 }
