@@ -8,18 +8,20 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Component("UserDbStorage")
 @Primary
 @RequiredArgsConstructor
 @Log4j2
 public class UserDbStorage implements UserStorage {
-    private Long id;
     private DataSource dataSource;
     JdbcTemplate jdbcTemplate;
 
@@ -30,9 +32,16 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User findUserById(Long idUser) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
-        User user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = ?", new Object[]{idUser}, new UserMapper());
-        log.info("Пользователь с id {} найден.", idUser);
+        User user = new User();
+        try {
+            jdbcTemplate = new JdbcTemplate(dataSource);
+            user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = ?", new Long[]{idUser}
+                    , new UserMapper());
+            log.info("Пользователь с id {} найден.", idUser);
+        } catch (Exception ex) {
+            log.info("Ошибка! Пользователь с id {} не найден.", idUser);
+            throw new UserNotFoundException("Ошибка! Пользователь с id " + idUser + " не найден.");
+        }
         return user;
     }
 
@@ -65,7 +74,7 @@ public class UserDbStorage implements UserStorage {
 
                 }, generatedKeyHolder);
 
-        id = (long) generatedKeyHolder.getKey().intValue();
+        Long id = (long) Objects.requireNonNull(generatedKeyHolder.getKey()).intValue();
         user.setId(id);
 
         log.info("rowsAffected = {}, id={}", rowsAffected, id);
@@ -87,7 +96,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public void remove(Long id) {
         this.jdbcTemplate.update("DELETE FROM users where user_id = ?",
-                Long.valueOf(id));
+                id);
         log.info("Пользователь с id {} удалён.", id);
     }
 
@@ -102,5 +111,4 @@ public class UserDbStorage implements UserStorage {
             return user;
         }
     }
-
 }
