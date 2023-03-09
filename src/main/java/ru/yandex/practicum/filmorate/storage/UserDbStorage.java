@@ -15,7 +15,7 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.Set;
 
 @Component("UserDbStorage")
 @Primary
@@ -125,9 +125,38 @@ public class UserDbStorage implements UserStorage {
 
 
         log.info("rowsAffected = {}, id={}", rowsAffected, id);
-        log.info("Пользователь с id {} добавлен в друзья к пользователю с id {}", userId, userId);
+        log.info("Пользователь с id {} добавлен в друзья к пользователю с id {}", friendId, userId);
 
     }
+
+    @Override
+    public void removeFriend(Long userId, Long friendId) {
+        jdbcTemplate.update("DELETE FROM users_friends_id where user_id = ? AND friend_id = ?",
+                userId, friendId);
+        log.info("Пользователь  с id {} удалён из друзей пользователя с id {}.", friendId , userId);
+    }
+
+//    @Override
+//    public Set<Long> findUserFriendsById(Long idUser) {
+//        User user;
+//        try {
+//            jdbcTemplate = new JdbcTemplate(dataSource);
+//            user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = ?"
+//                    , new UserMapper(), idUser);
+//            log.info("Пользователь с id {} найден.", idUser);
+//        } catch (Exception ex) {
+//            log.info("Ошибка! Пользователь с id {} не найден.", idUser);
+//            throw new UserNotFoundException("Ошибка! Пользователь с id " + idUser + " не найден.");
+//        }
+//        return user;
+//    }
+    @Override
+    public Set<Long> findUserFriendsById(Long idUser) {
+        jdbcTemplate = new JdbcTemplate(dataSource);
+        return jdbcTemplate.queryForList("SELECT friend_id FROM users_friends_id WHERE user_id = ? ", idUser);
+    }
+
+
     private static final class UserMapper implements RowMapper<User> {
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
             User user = new User();

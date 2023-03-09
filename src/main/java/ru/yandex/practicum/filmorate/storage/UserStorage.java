@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface UserStorage {
     Map<Long, User> users = new HashMap<>();
@@ -21,4 +22,8 @@ public interface UserStorage {
     void remove(Long id);
 
     void addFriend(Long userId, Long friendId);
+
+    void removeFriend(Long userId, Long friendId);
+
+    Set<Long> findUserFriendsById(Long idUser);
 }

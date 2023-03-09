@@ -39,4 +39,9 @@ public class InMemoryUserStorage implements UserStorage {
     public void addFriend(Long userId, Long friendId) {
 
     }
+
+    @Override
+    public void removeFriend(Long userId, Long friendId) {
+
+    }
 }

@@ -53,7 +53,6 @@ public class UserService {
     public User addFriend(Long userId, Long friendId) {
         User user = userStorage.findUserById(userId);
         User friendUser = userStorage.findUserById(friendId);
-        log.info("Пользователь {} добавлен в друзья к пользователю {}.", user, friendUser);
         userStorage.addFriend(userId, friendId);
         // user.setUserFriendsId(friendId);
         //friendUser.setUserFriendsId(userId);
@@ -63,9 +62,9 @@ public class UserService {
     public User removeFriend(Long userId, Long friendId) {
         User user = userStorage.findUserById(userId);
         User friendUser = userStorage.findUserById(friendId);
-        log.info("Пользователь {} удалён из друзей пользователя {}.", user, friendUser);
-        user.removeFriends(friendUser);
-        friendUser.removeFriends(user);
+        userStorage.removeFriend(userId, friendId);
+       // user.removeFriends(friendUser);
+       // friendUser.removeFriends(user);
         return friendUser;
     }
 
