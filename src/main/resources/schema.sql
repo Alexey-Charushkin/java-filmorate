@@ -1,18 +1,16 @@
-
-
 CREATE TABLE IF NOT EXISTS `users` (
                          `user_id` int PRIMARY KEY AUTO_INCREMENT,
-                         `email` varchar(256),
+                         `email` varchar(256) UNIQUE,
                          `login` varchar(50),
                          `user_name` varchar(50),
                          `birthdate` date
 );
 
 CREATE TABLE IF NOT EXISTS `users_friends_id` (
+                                    `users_friends_id` int PRIMARY KEY AUTO_INCREMENT,
                                     `user_id` int,
                                     `friend_id` int,
-                                    `friend_status` varchar(11),
-                                    PRIMARY KEY (`user_id`, `friend_id`)
+                                    `friend_status` varchar(11)
 );
 
 CREATE TABLE IF NOT EXISTS `films` (
@@ -26,9 +24,9 @@ CREATE TABLE IF NOT EXISTS `films` (
 );
 
 CREATE TABLE IF NOT EXISTS `users_films_like` (
+                                    `users_films_like_id` int PRIMARY KEY AUTO_INCREMENT,
                                     `user_id` int,
-                                    `film_id` int,
-                                    PRIMARY KEY (`user_id`, `film_id`)
+                                    `film_id` int
 );
 
 CREATE TABLE IF NOT EXISTS `genre` (
@@ -37,9 +35,9 @@ CREATE TABLE IF NOT EXISTS `genre` (
 );
 
 CREATE TABLE IF NOT EXISTS `films_genres` (
+                                `films_genres_id` int PRIMARY KEY AUTO_INCREMENT,
                                 `film_id` int,
-                                `genre_id` int,
-                                PRIMARY KEY (`film_id`, `genre_id`)
+                                `genre_id` int
 );
 
 ALTER TABLE `films_genres` ADD FOREIGN KEY (`film_id`) REFERENCES `films` (`film_id`);

@@ -32,11 +32,11 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User findUserById(Long idUser) {
-        User user = new User();
+        User user;
         try {
             jdbcTemplate = new JdbcTemplate(dataSource);
-            user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = ?", new Long[]{idUser}
-                    , new UserMapper());
+            user = jdbcTemplate.queryForObject("SELECT * FROM users WHERE user_id = ?"
+                    , new UserMapper(), idUser);
             log.info("Пользователь с id {} найден.", idUser);
         } catch (Exception ex) {
             log.info("Ошибка! Пользователь с id {} не найден.", idUser);
@@ -97,10 +97,37 @@ public class UserDbStorage implements UserStorage {
     public void remove(Long id) {
         jdbcTemplate.update("DELETE FROM users where user_id = ?",
                 id);
-        jdbcTemplate.update("ALTER TABLE users alter column USER_ID restart  with ?",id);
+    //    jdbcTemplate.update("ALTER TABLE users alter column USER_ID restart  with ?",id);
         log.info("Пользователь с id {} удалён.", id);
     }
+    public void addFriend(Long userId, Long friend_id) {
 
+        GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate = new JdbcTemplate(dataSource);
+
+        String sql = "INSERT INTO `users_friends_id`(`user_id`, `friend_id`, `friend_status`) VALUES(?, ?, ?);";
+
+        int rowsAffected =
+                jdbcTemplate.update(conn -> {
+
+                    PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+//                    preparedStatement.setString(1, user.getEmail());
+//                    preparedStatement.setString(2, user.getLogin());
+//                    preparedStatement.setString(3, user.getName());
+//                    preparedStatement.setObject(4, user.getBirthday());
+
+                    return preparedStatement;
+
+                }, generatedKeyHolder);
+
+//        Long id = (long) Objects.requireNonNull(generatedKeyHolder.getKey()).intValue();
+//        user.setId(id);
+//
+//        log.info("rowsAffected = {}, id={}", rowsAffected, id);
+//        log.info("Пользователь добавлен {}.", user);
+    }
     private static final class UserMapper implements RowMapper<User> {
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
             User user = new User();

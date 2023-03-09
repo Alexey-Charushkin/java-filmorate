@@ -31,7 +31,7 @@ public class UserService {
     }
 
     public ResponseEntity<?> update(User user) {
-      //  validator.userIsPresent(user.getId());
+        validator.userIsPresent(user.getId());
         validator.validate(user);
         userStorage.update(user);
         return new ResponseEntity<>(user, HttpStatus.OK);
@@ -43,16 +43,16 @@ public class UserService {
     }
 
     public User findById(Long id) {
-      //  validator.userIsPresent(id);
+        validator.userIsPresent(id);
         return userStorage.findUserById(id);
     }
 
     public User addFriend(Long userId, Long friendId) {
-       User user = userStorage.findUserById(userId);
-       User friendUser = userStorage.findUserById(friendId);
+        User user = userStorage.findUserById(userId);
+        User friendUser = userStorage.findUserById(friendId);
         log.info("Пользователь {} добавлен в друзья к пользователю {}.", user, friendUser);
-        user.setUserFriendsId(friendId);
-        friendUser.setUserFriendsId(userId);
+       // user.setUserFriendsId(friendId);
+        //friendUser.setUserFriendsId(userId);
         return friendUser;
     }
 
@@ -66,7 +66,7 @@ public class UserService {
     }
 
     public void removeUserById(Long userId) {
-      //  User user = validator.userIsPresent(userId);
+        validator.userIsPresent(userId);
         userStorage.remove(userId);
     }
 

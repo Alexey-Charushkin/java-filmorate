@@ -25,13 +25,6 @@ public class User extends Item {
 
     private List<FriendStatus> friendStatuses;
 
-//    public User(String email, String login, String name, @NonNull LocalDate birthday) {
-//        this.email = email;
-//        this.login = login;
-//        this.name = name;
-//        this.birthday = birthday;
-//    }
-
     @JsonIgnore
     private Set<Long> userFriendsId = new HashSet<>();
 

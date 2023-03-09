@@ -73,20 +73,9 @@ public class Validate<T> {
         }
     }
 
-//    User userIsPresent(Long id) {
-//
-//        Optional<User> isUser = Optional.ofNullable(userStorage.findUserById(id));
-//        if (!isUser.isPresent()) {
- //           log.warn("Пользователь c id {} отсутствует в базе.", id);
-//            try {
-//                throw new UserNotFoundException("Пользователь с id " + id
-//                        + " отсутствует в базе.");
-//            } catch (UserNotFoundException e) {
-//                throw new RuntimeException(e);
-//            }
-//        }
-//        return isUser.get();
-//    }
+    User userIsPresent(Long id) {
+            return userStorage.findUserById(id);
+    }
 
     Film filmIsPresent(Long id) {
         Optional<Film> isFilm = Optional.ofNullable(filmStorage.getFilm(id));
