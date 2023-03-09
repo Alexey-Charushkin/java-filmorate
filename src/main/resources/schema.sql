@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `users` (
                          `user_id` int PRIMARY KEY AUTO_INCREMENT,
-                         `email` varchar(256) UNIQUE,
+                         `email` varchar(256),
                          `login` varchar(50),
                          `user_name` varchar(50),
                          `birthdate` date

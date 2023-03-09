@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.UserDaoStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.sql.SQLException;
@@ -21,6 +22,8 @@ public class UserService {
     private final Validate validator;
     @Qualifier("UserDbStorage")
     private final UserStorage userStorage;
+
+//    private final UserDaoStorage userDaoStorage;
 
     private Long id = 0L;
 
@@ -51,7 +54,8 @@ public class UserService {
         User user = userStorage.findUserById(userId);
         User friendUser = userStorage.findUserById(friendId);
         log.info("Пользователь {} добавлен в друзья к пользователю {}.", user, friendUser);
-       // user.setUserFriendsId(friendId);
+        userStorage.addFriend(userId, friendId);
+        // user.setUserFriendsId(friendId);
         //friendUser.setUserFriendsId(userId);
         return friendUser;
     }

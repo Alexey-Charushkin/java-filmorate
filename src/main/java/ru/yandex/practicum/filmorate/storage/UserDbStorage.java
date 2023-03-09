@@ -100,7 +100,7 @@ public class UserDbStorage implements UserStorage {
     //    jdbcTemplate.update("ALTER TABLE users alter column USER_ID restart  with ?",id);
         log.info("Пользователь с id {} удалён.", id);
     }
-    public void addFriend(Long userId, Long friend_id) {
+    public void addFriend(Long userId, Long friendId) {
 
         GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
 
@@ -113,20 +113,20 @@ public class UserDbStorage implements UserStorage {
 
                     PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
-//                    preparedStatement.setString(1, user.getEmail());
-//                    preparedStatement.setString(2, user.getLogin());
-//                    preparedStatement.setString(3, user.getName());
-//                    preparedStatement.setObject(4, user.getBirthday());
+                    preparedStatement.setLong(1, userId);
+                    preparedStatement.setLong(2, friendId);
+                    preparedStatement.setString(3, "в разр");
 
                     return preparedStatement;
 
                 }, generatedKeyHolder);
 
-//        Long id = (long) Objects.requireNonNull(generatedKeyHolder.getKey()).intValue();
-//        user.setId(id);
-//
-//        log.info("rowsAffected = {}, id={}", rowsAffected, id);
-//        log.info("Пользователь добавлен {}.", user);
+        Long id = (long) Objects.requireNonNull(generatedKeyHolder.getKey()).intValue();
+
+
+        log.info("rowsAffected = {}, id={}", rowsAffected, id);
+        log.info("Пользователь с id {} добавлен в друзья к пользователю с id {}", userId, userId);
+
     }
     private static final class UserMapper implements RowMapper<User> {
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
