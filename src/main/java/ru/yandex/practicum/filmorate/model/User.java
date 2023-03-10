@@ -35,7 +35,6 @@ public class User extends Item {
     public Set<Long> getUserFriendsId() {
         return userFriendsId;
     }
-
     public void removeFriends(User user) {
         userFriendsId.remove(user);
     }

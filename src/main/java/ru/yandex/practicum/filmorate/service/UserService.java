@@ -2,15 +2,12 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserDaoStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -20,14 +17,10 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final Validate validator;
-    @Qualifier("UserDbStorage")
+
     private final UserStorage userStorage;
 
-//    private final UserDaoStorage userDaoStorage;
-
-    private Long id = 0L;
-
-    public User create(User user) {
+      public User create(User user) {
         validator.validate(user);
         userStorage.add(user);
         return user;
@@ -51,20 +44,16 @@ public class UserService {
     }
 
     public User addFriend(Long userId, Long friendId) {
-        User user = userStorage.findUserById(userId);
+        validator.userIsPresent(userId);
         User friendUser = userStorage.findUserById(friendId);
         userStorage.addFriend(userId, friendId);
-        // user.setUserFriendsId(friendId);
-        //friendUser.setUserFriendsId(userId);
         return friendUser;
     }
 
     public User removeFriend(Long userId, Long friendId) {
-        User user = userStorage.findUserById(userId);
+        validator.userIsPresent(userId);
         User friendUser = userStorage.findUserById(friendId);
         userStorage.removeFriend(userId, friendId);
-       // user.removeFriends(friendUser);
-       // friendUser.removeFriends(user);
         return friendUser;
     }
 
@@ -74,20 +63,21 @@ public class UserService {
     }
 
     public List<User> getFriends(Long userId) {
+        validator.userIsPresent(userId);
         User user = userStorage.findUserById(userId);
         List<User> userFriends = new ArrayList<>();
         if (user.getUserFriendsId().size() == 0) {
-            log.info("Список друзей пользователя {} пуст.", user.getName());
+            log.info("У пользователя {} нет друзей.", user.getName());
         }
         Set<Long> friendsId = new HashSet<>(user.getUserFriendsId());
         for (Long id : friendsId) {
             userFriends.add(userStorage.findUserById(id));
         }
-        log.info("Количество друзей пользователя {} : {}.", user.getName(), userFriends.size());
+
         return userFriends;
     }
 
-    public List<User> getСommonFriends(Long id, Long friendId) {
+    public List<User> getCommonFriends(Long id, Long friendId) {
         User user = userStorage.findUserById(id);
         User userFriend = userStorage.findUserById(friendId);
         if (user.getUserFriendsId().size() == 0) {

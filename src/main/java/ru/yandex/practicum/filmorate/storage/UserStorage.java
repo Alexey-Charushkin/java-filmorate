@@ -2,11 +2,9 @@ package ru.yandex.practicum.filmorate.storage;
 
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public interface UserStorage {
     Map<Long, User> users = new HashMap<>();
@@ -25,5 +23,5 @@ public interface UserStorage {
 
     void removeFriend(Long userId, Long friendId);
 
-    Set<Long> findUserFriendsById(Long idUser);
+    List<Long> findUserFriendsById(Long idUser);
 }

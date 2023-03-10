@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.sql.SQLException;
 import java.util.*;
 
 @Log4j2
@@ -64,6 +63,6 @@ public class UserController {
 
     @GetMapping("{id}/friends/common/{otherId}")
     public List<User> getFriendsUser(@PathVariable Long id, @PathVariable Long otherId) {
-        return userService.getСommonFriends(id, otherId);
+        return userService.getCommonFriends(id, otherId);
     }
 }
