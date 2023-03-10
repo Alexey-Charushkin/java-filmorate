@@ -24,4 +24,6 @@ public interface UserStorage {
     void removeFriend(Long userId, Long friendId);
 
     List<Long> findUserFriendsById(Long idUser);
+
+    boolean isFriendExist(Long userId, Long friendId);
 }

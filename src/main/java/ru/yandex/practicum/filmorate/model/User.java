@@ -23,7 +23,7 @@ public class User extends Item {
     @NonNull
     private LocalDate birthday;
 
-    private List<FriendStatus> friendStatuses;
+    // private List<FriendStatus> friendStatuses;
 
     @JsonIgnore
     private Set<Long> userFriendsId = new HashSet<>();

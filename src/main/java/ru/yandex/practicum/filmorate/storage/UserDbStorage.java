@@ -45,6 +45,7 @@ public class UserDbStorage implements UserStorage {
         for (Long id : userFriendsId) {
             user.setUserFriendsId(id);
         }
+        //defineFriendStatus(Long userId, Long friendId)
         return user;
     }
 
@@ -104,9 +105,15 @@ public class UserDbStorage implements UserStorage {
 
     public void addFriend(Long userId, Long friendId) {
 
+        if (isFriendExist(userId, friendId)) {
+            log.info("Пользователь с id {} уже является другом пользователя с id {}", friendId, userId);
+            return;
+        }
         GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate = new JdbcTemplate(dataSource);
+
+        String friendStatus = defineFriendStatus(userId, friendId);
 
         String sql = "INSERT INTO `users_friends_id`(`user_id`, `friend_id`, `friend_status`) VALUES(?, ?, ?);";
 
@@ -117,7 +124,7 @@ public class UserDbStorage implements UserStorage {
 
                     preparedStatement.setLong(1, userId);
                     preparedStatement.setLong(2, friendId);
-                    preparedStatement.setString(3, "в разр");
+                    preparedStatement.setString(3, friendStatus);
 
                     return preparedStatement;
 
@@ -130,10 +137,28 @@ public class UserDbStorage implements UserStorage {
 
     }
 
+    public String defineFriendStatus(Long userId, Long friendId) {
+
+        String friendStatus = "";
+
+        if (isFriendExist(userId, friendId) && isFriendExist(friendId, friendId)) {
+
+            return friendStatus = "подтверждённая";
+        }
+        return friendStatus = "неподтверждённая";
+
+    }
+
     @Override
     public void removeFriend(Long userId, Long friendId) {
+        if (!isFriendExist(userId, friendId)) {
+            log.info("Дружба пользователей  с id {} и id {} не обранужена.", friendId, userId);
+            return;
+        }
         jdbcTemplate.update("DELETE FROM users_friends_id where user_id = ? AND friend_id = ?",
                 userId, friendId);
+
+        defineFriendStatus(userId, friendId);
         log.info("Пользователь  с id {} удалён из друзей пользователя с id {}.", friendId, userId);
     }
 
@@ -150,6 +175,14 @@ public class UserDbStorage implements UserStorage {
             throw new UserNotFoundException("Список друзей пользователя с id " + idUser + " пуст.");
         }
         return friendsId;
+    }
+
+    @Override
+    public boolean isFriendExist(Long userId, Long friendId) {
+        jdbcTemplate = new JdbcTemplate(dataSource);
+        String sql = "SELECT COUNT(*) FROM users_friends_id WHERE column1 = ? AND column2 = ?";
+        int count = jdbcTemplate.queryForObject(sql, new Object[]{userId, friendId}, Integer.class);
+        return count > 0;
     }
 
     private static final class UserMapper implements RowMapper<User> {
