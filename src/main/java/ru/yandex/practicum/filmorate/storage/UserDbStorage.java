@@ -113,8 +113,6 @@ public class UserDbStorage implements UserStorage {
 
         jdbcTemplate = new JdbcTemplate(dataSource);
 
-        String friendStatus = defineFriendStatus(userId, friendId);
-
         String sql = "INSERT INTO `users_friends_id`(`user_id`, `friend_id`, `friend_status`) VALUES(?, ?, ?);";
 
         int rowsAffected =
@@ -124,7 +122,7 @@ public class UserDbStorage implements UserStorage {
 
                     preparedStatement.setLong(1, userId);
                     preparedStatement.setLong(2, friendId);
-                    preparedStatement.setString(3, friendStatus);
+                    preparedStatement.setString(3, "неподтверждённая");
 
                     return preparedStatement;
 
@@ -132,21 +130,25 @@ public class UserDbStorage implements UserStorage {
 
         Long id = (long) Objects.requireNonNull(generatedKeyHolder.getKey()).intValue();
 
+        defineFriendStatus(userId, friendId);
+
         log.info("rowsAffected = {}, id={}", rowsAffected, id);
         log.info("Пользователь с id {} добавлен в друзья к пользователю с id {}", friendId, userId);
 
     }
 
-    public String defineFriendStatus(Long userId, Long friendId) {
+    public void defineFriendStatus(Long userId, Long friendId) {
 
         String friendStatus = "";
 
-        if (isFriendExist(userId, friendId) && isFriendExist(friendId, friendId)) {
-
-            return friendStatus = "подтверждённая";
+        if (isFriendExist(userId, friendId) && isFriendExist(friendId, userId)) {
+            friendStatus = "подтверждённая";
+            jdbcTemplate.update("UPDATE users_friends_id SET friend_status = ? WHERE user_id = ?", friendStatus, friendId);
+            jdbcTemplate.update("UPDATE users_friends_id SET friend_status = ? WHERE user_id = ?", friendStatus, userId);
+        } else {
+            friendStatus = "неподтверждённая";
+            jdbcTemplate.update("UPDATE users_friends_id SET friend_status = ? WHERE user_id = ?", friendStatus, friendId);
         }
-        return friendStatus = "неподтверждённая";
-
     }
 
     @Override
@@ -180,7 +182,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public boolean isFriendExist(Long userId, Long friendId) {
         jdbcTemplate = new JdbcTemplate(dataSource);
-        String sql = "SELECT COUNT(*) FROM users_friends_id WHERE column1 = ? AND column2 = ?";
+        String sql = "SELECT COUNT(*) FROM users_friends_id WHERE user_id = ? AND friend_id = ?";
         int count = jdbcTemplate.queryForObject(sql, new Object[]{userId, friendId}, Integer.class);
         return count > 0;
     }

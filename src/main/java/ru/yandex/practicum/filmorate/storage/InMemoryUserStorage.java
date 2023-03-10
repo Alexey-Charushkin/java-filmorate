@@ -49,4 +49,9 @@ public class InMemoryUserStorage implements UserStorage {
     public List<Long> findUserFriendsById(Long idUser) {
         return null;
     }
+
+    @Override
+    public boolean isFriendExist(Long userId, Long friendId) {
+        return false;
+    }
 }
