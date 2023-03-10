@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `users_friends_id` (
                                     `users_friends_id` int PRIMARY KEY AUTO_INCREMENT,
                                     `user_id` int,
                                     `friend_id` int,
-                                    `friend_status` varchar(11)
+                                    `friend_status` varchar(16)
 );
 
 CREATE TABLE IF NOT EXISTS `films` (
@@ -40,14 +40,14 @@ CREATE TABLE IF NOT EXISTS `films_genres` (
                                 `genre_id` int
 );
 
-ALTER TABLE `films_genres` ADD FOREIGN KEY (`film_id`) REFERENCES `films` (`film_id`);
+ALTER TABLE `films_genres` ADD FOREIGN KEY (`film_id`) REFERENCES `films` (`film_id`) ON DELETE CASCADE;
 
-ALTER TABLE `users_films_like` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
+ALTER TABLE `users_films_like` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
-ALTER TABLE `users_films_like` ADD FOREIGN KEY (`film_id`) REFERENCES `films` (`film_id`);
+ALTER TABLE `users_films_like` ADD FOREIGN KEY (`film_id`) REFERENCES `films` (`film_id`) ON DELETE CASCADE;
 
-ALTER TABLE `users_friends_id` ADD FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`);
+ALTER TABLE `users_friends_id` ADD FOREIGN KEY  (`user_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
-ALTER TABLE `users_friends_id` ADD FOREIGN KEY (`friend_id`) REFERENCES `users` (`user_id`);
+ALTER TABLE `users_friends_id` ADD FOREIGN KEY (`friend_id`) REFERENCES `users` (`user_id`) ON DELETE CASCADE;
 
-ALTER TABLE `films_genres` ADD FOREIGN KEY (`genre_id`) REFERENCES `genre` (`genre_id`);
+ALTER TABLE `films_genres` ADD FOREIGN KEY (`genre_id`) REFERENCES `genre` (`genre_id`) ON DELETE CASCADE;
