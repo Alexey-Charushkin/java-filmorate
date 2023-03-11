@@ -74,12 +74,12 @@ public class FilmService {
 //        return film;
 //    }
 
-//    public List<Film> filmsPopular(Integer count) {
-//        return filmStorage.getFilms().values().stream()
-//                .sorted(comparator)
-//                .limit(count)
-//                .collect(Collectors.toList());
-//    }
+    public List<Film> filmsPopular(Integer count) {
+        return filmStorage.getFilms().stream()
+                .sorted(comparator)
+                .limit(count)
+                .collect(Collectors.toList());
+    }
 
     Comparator<Film> comparator = (o1, o2) -> o2.getRate() - o1.getRate();
 }

@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS `users_friends_id` (
                                     `users_friends_id` int PRIMARY KEY AUTO_INCREMENT,
                                     `user_id` int,
                                     `friend_id` int,
-                                    `friend_status` varchar(11)
+                                    `friend_status` varchar(16)
 );
 
 CREATE TABLE IF NOT EXISTS `films` (
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `users_films_like` (
 );
 
 CREATE TABLE IF NOT EXISTS `genre` (
-                         `genre_id` int PRIMARY KEY AUTO_INCREMENT,
+                         `genre_id` int PRIMARY KEY,
                          `genre_name` varchar(50)
 );
 

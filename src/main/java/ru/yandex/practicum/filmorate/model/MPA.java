@@ -11,5 +11,5 @@ public class MPA {
 
     private Integer id;
 
-   private String mpaRatingName;
+   private String name;
 }

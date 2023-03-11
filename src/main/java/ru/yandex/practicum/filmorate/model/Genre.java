@@ -9,8 +9,10 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @RequiredArgsConstructor
+public
 class Genre {
+    private int id;
     private Genres genre;
 }
 
-enum Genres {КОИЕДИЯ, ДРАМА, МУЛЬТФИЛЬМ, ТРИЛЛЕР, ДОКУМЕНТАЛЬНЫЙ, БОЕВИК}
+enum Genres {КОМЕДИЯ, ДРАМА, МУЛЬТФИЛЬМ, ТРИЛЛЕР, ДОКУМЕНТАЛЬНЫЙ, БОЕВИК}

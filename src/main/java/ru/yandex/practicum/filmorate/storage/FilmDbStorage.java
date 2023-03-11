@@ -9,7 +9,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 
 import javax.sql.DataSource;
@@ -24,9 +26,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @Log4j2
 public class FilmDbStorage implements FilmDaoStorage {
-
     private DataSource dataSource;
-
     JdbcTemplate jdbcTemplate;
 
     @Autowired
@@ -35,49 +35,33 @@ public class FilmDbStorage implements FilmDaoStorage {
     }
 
     @Override
-    public Film getFilm(Long id) {
-        return null;
+    public Film getFilm(Long idFilm) {
+        Film film;
+        try {
+            jdbcTemplate = new JdbcTemplate(dataSource);
+            film = jdbcTemplate.queryForObject("SELECT * FROM films WHERE film_id = ?"
+                    , new FilmDbStorage.FilmMapper(), idFilm);
+            log.info("Фильм с id {} найден.", idFilm);
+        } catch (Exception ex) {
+            log.info("Ошибка! Фильм с id {} не найден.", idFilm);
+            throw new FilmNotFoundException("Ошибка! Фильм с id " + idFilm + " не найден.");
+        }
+        film.getMpa().setName(getMPAName(film.getMpa().getId()));
+//        List<Long> userFriendsId = findUserFriendsById(idUser);
+//        for (Long id : userFriendsId) {
+//            user.setUserFriendsId(id);
+//        }
+        return film;
     }
 
     @Override
     public List<Film> getFilms() {
-
-            jdbcTemplate = new JdbcTemplate(dataSource);
-            return jdbcTemplate.query("SELECT * FROM films", new FilmDbStorage.FilmMapper());
-    }
-
-    private void addFilmsRatings() {
-
         jdbcTemplate = new JdbcTemplate(dataSource);
-
-        List<MPA> mpaToAdd = new ArrayList<>();
-        mpaToAdd.add(new MPA(1, "G"));
-        mpaToAdd.add(new MPA(2, "PG"));
-        mpaToAdd.add(new MPA(3, "PG-13"));
-        mpaToAdd.add(new MPA(4, "R"));
-        mpaToAdd.add(new MPA(5, "NC-17"));
-
-
-        String sql = "INSERT INTO mpa_rating (id, mpa_rating_name) VALUES (?, ?)";
-        int[] rowsAffected = jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-            @Override
-            public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-                MPA mpa = mpaToAdd.get(i);
-                preparedStatement.setInt(1, mpa.getId());
-                preparedStatement.setString(2, mpa.getMpaRatingName());
-            }
-
-            @Override
-            public int getBatchSize() {
-                return mpaToAdd.size();
-            }
-        });
-
-        System.out.println(Arrays.toString(rowsAffected) + " rows affected");
-    }
-    private boolean isTableEmpty(JdbcTemplate jdbcTemplate, String tableName) {
-        int count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM " + tableName, Integer.class);
-        return count == 0;
+        List<Film> films = jdbcTemplate.query("SELECT * FROM films", new FilmDbStorage.FilmMapper());
+        for (Film film : films) {
+            film.getMpa().setName(getMPAName(film.getMpa().getId()));
+        }
+        return films;
     }
 
     @Override
@@ -87,6 +71,7 @@ public class FilmDbStorage implements FilmDaoStorage {
         jdbcTemplate = new JdbcTemplate(dataSource);
 
         if (isTableEmpty(jdbcTemplate, "mpa_rating")) addFilmsRatings();
+        if (isTableEmpty(jdbcTemplate, "genre")) addGenres();
 
         String sql = "INSERT INTO `films`(`film_name`, `description`, `release_date`, `duration`, `mpa_rating_id`, `rate`)" +
                 " VALUES(?, ?, ?, ?, ?, ?);";
@@ -110,19 +95,38 @@ public class FilmDbStorage implements FilmDaoStorage {
         Long id = (long) Objects.requireNonNull(generatedKeyHolder.getKey()).intValue();
         film.setId(id);
 
+        film.getMpa().setName(getMPAName(film.getMpa().getId()));
+
         log.info("rowsAffected = {}, id={}", rowsAffected, id);
         log.info("Фильм добавлен {}.", film);
     }
 
     @Override
-    public void addMPARating(Film film) {
-        String sql = "INSERT INTO films (film_id, genre_id) VALUES (?, ?)";
-        jdbcTemplate.update(sql, film.getId(), film.getMpa().getId());
+    public void update(Film film) {
+        jdbcTemplate = new JdbcTemplate(dataSource);
+
+        jdbcTemplate.update(
+                "UPDATE films SET film_name = ?, description = ?, release_date = ?, duration = ?, mpa_rating_id = ?," +
+                        "rate = ? where film_id = ?",
+                film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(),
+                film.getRate(), film.getId());
+
+        log.info("Фильм обновлён с id {}, {}.", film.getId(), film);
     }
 
-    @Override
-    public void update(Film film) {
+    private String getMPAName(Integer idMPA) {
+        String mpaName = "";
+        try {
+            jdbcTemplate = new JdbcTemplate(dataSource);
+            mpaName = jdbcTemplate.queryForObject("SELECT mpa_rating_name FROM mpa_rating WHERE id = ?",
+                    new Object[]{idMPA}, String.class);
 
+            log.info("MPA рейтинг с id {} найден.", idMPA);
+            return mpaName;
+        } catch (Exception ex) {
+            log.info("Ошибка! MPA рейтинг с id {} не найден.", idMPA);
+            throw new FilmNotFoundException("Ошибка! MPA рейтинг с id " + idMPA + " не найден.");
+        }
     }
 
     private static final class FilmMapper implements RowMapper<Film> {
@@ -137,8 +141,74 @@ public class FilmDbStorage implements FilmDaoStorage {
             MPA mpa = new MPA();
             mpa.setId(rs.getInt("mpa_rating_id"));
             film.setMpa(mpa);
+            Genre genre =new Genre();
             film.setRate(rs.getInt("rate"));
             return film;
         }
+    }
+
+    @Override
+    public void addMPARating(Film film) {
+        String sql = "INSERT INTO films (film_id, genre_id) VALUES (?, ?)";
+        jdbcTemplate.update(sql, film.getId(), film.getMpa().getId());
+    }
+
+    private void addFilmsRatings() {
+        jdbcTemplate = new JdbcTemplate(dataSource);
+
+        List<MPA> mpaToAdd = new ArrayList<>();
+        mpaToAdd.add(new MPA(1, "G"));
+        mpaToAdd.add(new MPA(2, "PG"));
+        mpaToAdd.add(new MPA(3, "PG-13"));
+        mpaToAdd.add(new MPA(4, "R"));
+        mpaToAdd.add(new MPA(5, "NC-17"));
+
+        String sql = "INSERT INTO mpa_rating (id, mpa_rating_name) VALUES (?, ?)";
+        int[] rowsAffected = jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+                MPA mpa = mpaToAdd.get(i);
+                preparedStatement.setInt(1, mpa.getId());
+                preparedStatement.setString(2, mpa.getName());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return mpaToAdd.size();
+            }
+        });
+    }
+
+    private void addGenres() {
+        jdbcTemplate = new JdbcTemplate(dataSource);
+
+        List<String> genresNameToAdd = new ArrayList<>();
+        genresNameToAdd.add("Комедия");
+        genresNameToAdd.add("Драма");
+        genresNameToAdd.add("Мультфильм");
+        genresNameToAdd.add("Триллер");
+        genresNameToAdd.add("Документальный");
+        genresNameToAdd.add("Боевик");
+
+        String sql = "INSERT INTO genre (genre_id, genre_name) VALUES (?, ?)";
+        int[] rowsAffected = jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+                String name = genresNameToAdd.get(i);
+                preparedStatement.setInt(1, i);
+                preparedStatement.setString(2, name);
+            }
+
+            @Override
+            public int getBatchSize() {
+                return genresNameToAdd.size();
+            }
+        });
+        System.out.println(Arrays.toString(rowsAffected) + " rows affected");
+    }
+
+    private boolean isTableEmpty(JdbcTemplate jdbcTemplate, String tableName) {
+        int count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM " + tableName, Integer.class);
+        return count == 0;
     }
 }
