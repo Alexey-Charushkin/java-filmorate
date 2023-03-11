@@ -40,7 +40,7 @@ class FilmorateApplicationTests {
     private FilmController filmController;
     @Autowired
     private UserController userController;
-    private final UserDbStorage userStorage;
+    private final UserDaoStorage userStorage;
     @Autowired
     private Validate validate;
 

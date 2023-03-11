@@ -20,7 +20,7 @@ public class Film extends Item {
     private String description;
     private LocalDate releaseDate;
     private Integer duration;
-    private MPARating mpaRating;
+    private MPA mpa;
     private List<Genre> genres;
     private Integer rate = 0;
 

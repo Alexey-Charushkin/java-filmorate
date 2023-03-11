@@ -11,23 +11,24 @@ import java.util.*;
 public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
-    public Map<Long, Film> getFilms() {
+    public List<Film> getFilms() {
         return films;
     }
 
     @Override
     public Film getFilm(Long id) {
-        return films.get(id);
+      //  return films.get(id);
+        return null;
     }
 
     @Override
     public void add(Film film) {
-        films.put(film.getId(), film);
+       // films.add(film.getId(), film);
     }
 
     @Override
     public void update(Film film) {
-        films.put(film.getId(), film);
+        //films.put(film.getId(), film);
     }
 
 }

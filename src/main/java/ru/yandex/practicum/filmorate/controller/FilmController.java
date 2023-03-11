@@ -50,9 +50,9 @@ public class FilmController {
        // return filmService.removeLike(id, userId);
 //    }
 
-    @GetMapping("popular")
-    public List<Film> findFilmsByRate(@RequestParam(required = false, defaultValue = "10") Integer count) {
-        return new ArrayList<>(filmService.filmsPopular(count));
-    }
+//    @GetMapping("popular")
+//    public List<Film> findFilmsByRate(@RequestParam(required = false, defaultValue = "10") Integer count) {
+//        return new ArrayList<>(filmService.filmsPopular(count));
+//    }
 
 }
