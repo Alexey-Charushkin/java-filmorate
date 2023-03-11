@@ -22,12 +22,12 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void add(User user) {
-       // users.put(user.getId(), user);
+        users.put(user.getId(), user);
     }
 
     @Override
     public void update(User user) {
-   //     users.put(user.getId(), user);
+        users.put(user.getId(), user);
     }
 
     @Override
@@ -43,15 +43,5 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public void removeFriend(Long userId, Long friendId) {
 
-    }
-
-    @Override
-    public List<Long> findUserFriendsById(Long idUser) {
-        return null;
-    }
-
-    @Override
-    public boolean isFriendExist(Long userId, Long friendId) {
-        return false;
     }
 }

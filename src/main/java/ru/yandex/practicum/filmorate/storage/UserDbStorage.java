@@ -20,7 +20,7 @@ import java.util.Objects;
 @Primary
 @RequiredArgsConstructor
 @Log4j2
-public class UserDbStorage implements UserStorage {
+public class UserDbStorage implements UserDaoStorage {
     private DataSource dataSource;
     JdbcTemplate jdbcTemplate;
 
