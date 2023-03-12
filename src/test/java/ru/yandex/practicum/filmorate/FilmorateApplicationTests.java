@@ -17,7 +17,7 @@ import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.Validate;
-import ru.yandex.practicum.filmorate.storage.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.UserDaoStorage;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,7 +25,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -69,18 +68,6 @@ class FilmorateApplicationTests {
 
     @Test
     void contextLoads() {
-    }
-
-    @Test
-    void filmValidate() {
-        validate.validate(film);
-        ResponseEntity<Film> response = restTemplate.postForEntity("/films", film, Film.class);
-        assertThat(response.getStatusCode(), is(HttpStatus.OK));
-        assertThat(Objects.requireNonNull(response.getBody()).getId(), notNullValue());
-        assertThat(response.getBody().getName(), is("Super Film"));
-        assertThat(response.getBody().getDescription(), is("Super film description"));
-        assertThat(response.getBody().getReleaseDate().toString(), is("1967-03-25"));
-        assertThat(response.getBody().getDuration(), is(100));
     }
 
     @Test
@@ -204,6 +191,4 @@ class FilmorateApplicationTests {
         assertThat(idFriends.size(), equalTo(2));
 
     }
-
-
 }

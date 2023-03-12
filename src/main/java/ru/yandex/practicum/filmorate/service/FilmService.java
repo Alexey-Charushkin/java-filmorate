@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -81,4 +82,13 @@ public class FilmService {
     }
 
     Comparator<Film> comparator = (o1, o2) -> o2.getRate() - o1.getRate();
+
+    public List<Genre> getAllGenres() {
+                return filmStorage.getAllGenres();
+    }
+
+
+    public Genre getGenreById(Long id) {
+        return filmStorage.getGenreById(id);
+    }
 }

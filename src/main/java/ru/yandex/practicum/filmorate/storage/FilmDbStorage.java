@@ -63,18 +63,6 @@ public class FilmDbStorage implements FilmDaoStorage {
         return films;
     }
 
-    public List<Genre> getGenresByIdFilm(Long idFilm) {
-
-        jdbcTemplate = new JdbcTemplate(dataSource);
-        List<Genre> genres = jdbcTemplate.query("SELECT fg.genre_id, g.genre_name FROM films_genres AS fg JOIN " +
-                        "genre AS g ON fg.genre_id = g.genre_id WHERE fg.film_id = ?",
-                new Object[]{idFilm}, new FilmDbStorage.GenreMapper());
-        for (Genre genre : genres) {
-            genre.setGenreName(getGenreName(genre.getId()));
-        }
-        return genres;
-    }
-
     @Override
     public void add(Film film) {
         GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
@@ -107,6 +95,8 @@ public class FilmDbStorage implements FilmDaoStorage {
 
         film.setId(id);
         film.getMpa().setName(getMPAName(film.getMpa().getId()));
+
+        removeGenres(id);
         addFilmsGenresId(film);
         film.setGenres((getGenresByIdFilm(film.getId())));
 
@@ -125,7 +115,11 @@ public class FilmDbStorage implements FilmDaoStorage {
                 film.getRate(), film.getId());
 
         film.getMpa().setName(getMPAName(film.getMpa().getId()));
+
+        removeGenres(film.getId());
+
         addFilmsGenresId(film);
+
         film.setGenres((getGenresByIdFilm(film.getId())));
 
         log.info("Фильм обновлён с id {}, {}.", film.getId(), film);
@@ -180,20 +174,54 @@ public class FilmDbStorage implements FilmDaoStorage {
         log.info("Пользователь  с id {} удалил лайк фильму с id {}.", userId, filmId);
     }
 
-    private static final class GenreMapper implements RowMapper<Genre> {
-        public Genre mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Genre genre = new Genre();
-
-            genre.setId(rs.getInt("genre_id"));
-            genre.setGenreName(rs.getString("genre_name"));
-            return genre;
-        }
-    }
-
     @Override
     public void addMPARating(Film film) {
         String sql = "INSERT INTO films (film_id, genre_id) VALUES (?, ?)";
         jdbcTemplate.update(sql, film.getId(), film.getMpa().getId());
+    }
+
+    @Override
+    public List<Genre> getAllGenres() {
+        jdbcTemplate = new JdbcTemplate(dataSource);
+
+        List<Genre> genres = jdbcTemplate.query("SELECT * FROM genre",
+                new FilmDbStorage.GenreMapper());
+        return genres;
+    }
+
+    @Override
+    public Genre getGenreById(Long id) {
+
+        Genre genre;
+        jdbcTemplate = new JdbcTemplate(dataSource);
+
+        try {
+            genre = jdbcTemplate.queryForObject("SELECT * FROM genre WHERE genre_id = ?",
+                    new GenreMapper(), id);
+        } catch (Exception ex) {
+            log.info("Ошибка! Жанр фильма с id {} не найден.", id);
+            throw new FilmNotFoundException("Ошибка! Жанр фильма с id " + id + " не найден.");
+        }
+        return genre;
+    }
+
+    public List<Genre> getGenresByIdFilm(Long idFilm) {
+
+        jdbcTemplate = new JdbcTemplate(dataSource);
+        List<Genre> genres = jdbcTemplate.query("SELECT fg.genre_id, g.genre_name FROM films_genres AS fg JOIN " +
+                        "genre AS g ON fg.genre_id = g.genre_id WHERE fg.film_id = ?",
+                new Object[]{idFilm}, new FilmDbStorage.GenreMapper());
+        for (Genre genre : genres) {
+            genre.setName(getGenreName(genre.getId()));
+        }
+        return genres;
+    }
+
+    private void removeGenres(Long idFilm) {
+        jdbcTemplate = new JdbcTemplate(dataSource);
+
+        jdbcTemplate.update("DELETE FROM films_genres where film_id = ?", idFilm);
+
     }
 
     private String getMPAName(Integer idMPA) {
@@ -242,6 +270,16 @@ public class FilmDbStorage implements FilmDaoStorage {
     private boolean isTableEmpty(JdbcTemplate jdbcTemplate, String tableName) {
         int count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM " + tableName, Integer.class);
         return count == 0;
+    }
+
+    private static final class GenreMapper implements RowMapper<Genre> {
+        public Genre mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Genre genre = new Genre();
+
+            genre.setId(rs.getInt("genre_id"));
+            genre.setName(rs.getString("genre_name"));
+            return genre;
+        }
     }
 
     private static final class FilmMapper implements RowMapper<Film> {
@@ -294,20 +332,24 @@ public class FilmDbStorage implements FilmDaoStorage {
 
         if (film.getGenres() == null) return;
 
-        List<Genre> genreToAdd = new ArrayList<>(film.getGenres());
+        List<Genre> genres = new ArrayList<>();
+        genres.addAll(film.getGenres());
+
+        List<Genre> genresToAdd = new ArrayList<>();
+        genresToAdd.addAll(removeGenreDuplicates(genres));
 
         String sql = "INSERT INTO films_genres (film_id, genre_id) VALUES (?, ?)";
         int[] rowsAffected = jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
-                Genre genre = genreToAdd.get(i);
+                Genre genre = genresToAdd.get(i);
                 preparedStatement.setLong(1, film.getId());
                 preparedStatement.setInt(2, genre.getId());
             }
 
             @Override
             public int getBatchSize() {
-                return genreToAdd.size();
+                return genresToAdd.size();
             }
         });
         log.info("rowsAffected = {}", rowsAffected);
@@ -329,7 +371,7 @@ public class FilmDbStorage implements FilmDaoStorage {
             @Override
             public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
                 String name = genresNameToAdd.get(i);
-                preparedStatement.setInt(1, i);
+                preparedStatement.setInt(1, i + 1);
                 preparedStatement.setString(2, name);
             }
 
@@ -339,5 +381,23 @@ public class FilmDbStorage implements FilmDaoStorage {
             }
         });
         System.out.println(Arrays.toString(rowsAffected) + " rows affected");
+    }
+
+    private List<Genre> removeGenreDuplicates(List<Genre> genres) {
+
+        List<Genre> genresToSet = new ArrayList<>(genres);
+
+        Set<Integer> genresId = new HashSet<>();
+
+        for (Genre genre : genres) {
+            genresId.add(genre.getId());
+        }
+        genresToSet.clear();
+        for (Integer id : genresId) {
+            Genre genre = new Genre();
+            genre.setId(id);
+            genresToSet.add(genre);
+        }
+        return genresToSet;
     }
 }

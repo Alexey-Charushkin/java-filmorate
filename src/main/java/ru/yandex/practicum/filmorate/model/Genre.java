@@ -12,6 +12,6 @@ import org.springframework.stereotype.Component;
 public
 class Genre {
     private int id;
-    private String genreName;
+    private String name;
 }
 
