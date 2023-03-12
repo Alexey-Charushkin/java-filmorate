@@ -205,6 +205,30 @@ public class FilmDbStorage implements FilmDaoStorage {
         return genre;
     }
 
+    @Override
+    public List<MPA> getAllMPA() {
+        jdbcTemplate = new JdbcTemplate(dataSource);
+
+        List<MPA> mpas = jdbcTemplate.query("SELECT * FROM mpa_rating",
+                new FilmDbStorage.MPAMapper());
+        return mpas;
+    }
+
+    @Override
+    public MPA getMPAById(Long id) {
+        MPA mpa;
+        jdbcTemplate = new JdbcTemplate(dataSource);
+
+        try {
+            mpa = jdbcTemplate.queryForObject("SELECT * FROM mpa_rating WHERE id = ?",
+                    new MPAMapper(), id);
+        } catch (Exception ex) {
+            log.info("Ошибка! MPA рейтинг фильма с id {} не найден.", id);
+            throw new FilmNotFoundException("Ошибка! MPA рейтинг фильма с id " + id + " не найден.");
+        }
+        return mpa;
+    }
+
     public List<Genre> getGenresByIdFilm(Long idFilm) {
 
         jdbcTemplate = new JdbcTemplate(dataSource);
@@ -279,6 +303,16 @@ public class FilmDbStorage implements FilmDaoStorage {
             genre.setId(rs.getInt("genre_id"));
             genre.setName(rs.getString("genre_name"));
             return genre;
+        }
+    }
+
+    private static final class MPAMapper implements RowMapper<MPA> {
+        public MPA mapRow(ResultSet rs, int rowNum) throws SQLException {
+            MPA mpa = new MPA();
+
+            mpa.setId(rs.getInt("id"));
+            mpa.setName(rs.getString("mpa_rating_name"));
+            return mpa;
         }
     }
 
