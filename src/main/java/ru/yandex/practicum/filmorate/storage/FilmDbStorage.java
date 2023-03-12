@@ -48,10 +48,7 @@ public class FilmDbStorage implements FilmDaoStorage {
         }
         film.getMpa().setName(getMPAName(film.getMpa().getId()));
         film.setGenres(getGenresByIdFilm(film.getId()));
-//        List<Long> userFriendsId = findUserFriendsById(idUser);
-//        for (Long id : userFriendsId) {
-//            user.setUserFriendsId(id);
-//        }
+
         return film;
     }
 
@@ -72,11 +69,12 @@ public class FilmDbStorage implements FilmDaoStorage {
         List<Genre> genres = jdbcTemplate.query("SELECT fg.genre_id, g.genre_name FROM films_genres AS fg JOIN " +
                         "genre AS g ON fg.genre_id = g.genre_id WHERE fg.film_id = ?",
                 new Object[]{idFilm}, new FilmDbStorage.GenreMapper());
-        for (Genre genre: genres) {
+        for (Genre genre : genres) {
             genre.setGenreName(getGenreName(genre.getId()));
         }
         return genres;
     }
+
     @Override
     public void add(Film film) {
         GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
@@ -126,26 +124,80 @@ public class FilmDbStorage implements FilmDaoStorage {
                 film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(),
                 film.getRate(), film.getId());
 
+        film.getMpa().setName(getMPAName(film.getMpa().getId()));
+        addFilmsGenresId(film);
+        film.setGenres((getGenresByIdFilm(film.getId())));
+
         log.info("Фильм обновлён с id {}, {}.", film.getId(), film);
     }
 
+    @Override
+    public void addLike(Long filmId, Long userId) {
 
-//    public void defineFriendStatus(Long userId, Long friendId) {
-//
-//        String friendStatus = "";
-//
-//        if (isFriendExist(userId, friendId) && isFriendExist(friendId, userId)) {
-//            friendStatus = "подтверждённая";
-//            jdbcTemplate.update("UPDATE users_friends_id SET friend_status = ? WHERE user_id = ?", friendStatus, friendId);
-//            jdbcTemplate.update("UPDATE users_friends_id SET friend_status = ? WHERE user_id = ?", friendStatus, userId);
-//        } else {
-//            friendStatus = "неподтверждённая";
-//            jdbcTemplate.update("UPDATE users_friends_id SET friend_status = ? WHERE user_id = ?", friendStatus, friendId);
-//        }
-//    }
+        if (isLikeExist(filmId, userId)) {
+            log.info("Пользователь с id {} уже поставил лайк фильму с id {}", userId, filmId);
+            return;
+        }
+        GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate = new JdbcTemplate(dataSource);
+
+        String sql = "INSERT INTO `users_films_like`(`user_id`, `film_id`) VALUES(?, ?);";
+
+        int rowsAffected =
+                jdbcTemplate.update(conn -> {
+
+                    PreparedStatement preparedStatement = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+
+                    preparedStatement.setLong(1, userId);
+                    preparedStatement.setLong(2, filmId);
+
+                    return preparedStatement;
+
+                }, generatedKeyHolder);
+
+        Long id = (long) Objects.requireNonNull(generatedKeyHolder.getKey()).intValue();
+
+        Integer rate = getFilm(filmId).getRate();
+        changeRate(filmId, ++rate);
+
+        log.info("rowsAffected = {}, id={}", rowsAffected, id);
+        log.info("Пользователь с id {} добавил лайк фильму с id {}", userId, filmId);
+    }
+
+    @Override
+    public void removeLike(Long filmId, Long userId) {
+        if (!isLikeExist(filmId, userId)) {
+            log.info("Пользователь с  id {} не ставил лайк фильму с id {}.", userId, filmId);
+            return;
+        }
+        jdbcTemplate.update("DELETE FROM users_films_like where user_id = ? AND film_id = ?",
+                userId, filmId);
+
+        Integer rate = getFilm(filmId).getRate();
+        changeRate(filmId, --rate);
+
+        log.info("Пользователь  с id {} удалил лайк фильму с id {}.", userId, filmId);
+    }
+
+    private static final class GenreMapper implements RowMapper<Genre> {
+        public Genre mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Genre genre = new Genre();
+
+            genre.setId(rs.getInt("genre_id"));
+            genre.setGenreName(rs.getString("genre_name"));
+            return genre;
+        }
+    }
+
+    @Override
+    public void addMPARating(Film film) {
+        String sql = "INSERT INTO films (film_id, genre_id) VALUES (?, ?)";
+        jdbcTemplate.update(sql, film.getId(), film.getMpa().getId());
+    }
 
     private String getMPAName(Integer idMPA) {
-        String mpaName = "";
+        String mpaName;
         try {
             jdbcTemplate = new JdbcTemplate(dataSource);
             mpaName = jdbcTemplate.queryForObject("SELECT mpa_rating_name FROM mpa_rating WHERE id = ?",
@@ -158,8 +210,9 @@ public class FilmDbStorage implements FilmDaoStorage {
             throw new FilmNotFoundException("Ошибка! MPA рейтинг с id " + idMPA + " не найден.");
         }
     }
+
     private String getGenreName(Integer idGenre) {
-        String genreName = "";
+        String genreName;
         try {
             jdbcTemplate = new JdbcTemplate(dataSource);
             genreName = jdbcTemplate.queryForObject("SELECT genre_name FROM genre WHERE  genre_id = ?",
@@ -172,15 +225,25 @@ public class FilmDbStorage implements FilmDaoStorage {
             throw new FilmNotFoundException("Ошибка! Жанр с id " + idGenre + " не найден.");
         }
     }
-    private static final class GenreMapper implements RowMapper<Genre> {
-        public Genre mapRow(ResultSet rs, int rowNum) throws SQLException {
-            Genre genre =new Genre();
 
-            genre.setId(rs.getInt("genre_id"));
-            genre.setGenreName(rs.getString("genre_name"));
-           return genre;
-        }
+    private void changeRate(Long filmId, Integer rate) {
+
+        jdbcTemplate.update("UPDATE films SET rate = ? WHERE film_id = ?", rate, filmId);
+
     }
+
+    private boolean isLikeExist(Long filmId, Long userId) {
+        jdbcTemplate = new JdbcTemplate(dataSource);
+        String sql = "SELECT COUNT(*) FROM users_films_like WHERE user_id = ? AND film_id = ?";
+        int count = jdbcTemplate.queryForObject(sql, new Object[]{userId, filmId}, Integer.class);
+        return count > 0;
+    }
+
+    private boolean isTableEmpty(JdbcTemplate jdbcTemplate, String tableName) {
+        int count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM " + tableName, Integer.class);
+        return count == 0;
+    }
+
     private static final class FilmMapper implements RowMapper<Film> {
         public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
             Film film = new Film();
@@ -193,16 +256,9 @@ public class FilmDbStorage implements FilmDaoStorage {
             MPA mpa = new MPA();
             mpa.setId(rs.getInt("mpa_rating_id"));
             film.setMpa(mpa);
-            Genre genre =new Genre();
             film.setRate(rs.getInt("rate"));
             return film;
         }
-    }
-
-    @Override
-    public void addMPARating(Film film) {
-        String sql = "INSERT INTO films (film_id, genre_id) VALUES (?, ?)";
-        jdbcTemplate.update(sql, film.getId(), film.getMpa().getId());
     }
 
     private void addFilmsRatings() {
@@ -229,11 +285,14 @@ public class FilmDbStorage implements FilmDaoStorage {
                 return mpaToAdd.size();
             }
         });
+        log.info("rowsAffected = {}", rowsAffected);
     }
 
     private void addFilmsGenresId(Film film) {
 
         jdbcTemplate = new JdbcTemplate(dataSource);
+
+        if (film.getGenres() == null) return;
 
         List<Genre> genreToAdd = new ArrayList<>(film.getGenres());
 
@@ -251,7 +310,7 @@ public class FilmDbStorage implements FilmDaoStorage {
                 return genreToAdd.size();
             }
         });
-
+        log.info("rowsAffected = {}", rowsAffected);
     }
 
     private void addGenres() {
@@ -280,10 +339,5 @@ public class FilmDbStorage implements FilmDaoStorage {
             }
         });
         System.out.println(Arrays.toString(rowsAffected) + " rows affected");
-    }
-
-    private boolean isTableEmpty(JdbcTemplate jdbcTemplate, String tableName) {
-        int count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM " + tableName, Integer.class);
-        return count == 0;
     }
 }

@@ -40,15 +40,15 @@ public class FilmController {
         return filmService.findById(id);
     }
 
-//    @PutMapping("{id}/like/{userId}")
-//    public Film addLike(@PathVariable Long id, @PathVariable Long userId) {
-       // return filmService.addLike(id, userId);
-//    }
+    @PutMapping("{id}/like/{userId}")
+    public Film addLike(@PathVariable Long id, @PathVariable Long userId) {
+        return filmService.addLike(id, userId);
+    }
 
-//    @DeleteMapping("{id}/like/{userId}")
-//    public Film removeLike(@PathVariable Long id, @PathVariable Long userId) {
-       // return filmService.removeLike(id, userId);
-//    }
+    @DeleteMapping("{id}/like/{userId}")
+    public Film removeLike(@PathVariable Long id, @PathVariable Long userId) {
+        return filmService.removeLike(id, userId);
+    }
 
     @GetMapping("popular")
     public List<Film> findFilmsByRate(@RequestParam(required = false, defaultValue = "10") Integer count) {

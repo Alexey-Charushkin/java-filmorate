@@ -31,7 +31,6 @@ public class FilmService {
     public Film create(Film film) {
         validator.validate(film);
         film.setId(++id);
-        log.info("Фильм добавлен {}.", film);
         filmStorage.add(film);
         return film;
     }
@@ -40,7 +39,6 @@ public class FilmService {
     public ResponseEntity<?> update(Film film) {
         Optional<Film> oldItem = Optional.ofNullable(filmStorage.getFilm(film.getId()));
                 validator.validate(film);
-        log.info("Фильм обновлён {}.", film);
         filmStorage.update(film);
         return new ResponseEntity<>(film, HttpStatus.OK);
     }
@@ -52,27 +50,28 @@ public class FilmService {
 
     public Film findById(Long id) {
         validator.filmIsPresent(id);
-        log.info("Фильм с id {} найден.", id);
         return filmStorage.getFilm(id);
     }
 
-//    public Film addLike(Long filmId, Long userId)  {
-//        User user = validator.userIsPresent(userId);
-//        Film film = validator.filmIsPresent(filmId);
-//        log.info("Пользователь {} добавил лайк фильму {}.", user.getName(), film.getName());
-//        film.setRate(film.getRate() + 1);
-//        film.setUserAddLikeFilm(userId);
-//        return film;
-//    }
-//
-//    public Film removeLike(Long filmId, Long userId)  {
-//        User user = validator.userIsPresent(userId);
-//        Film film = validator.filmIsPresent(filmId);
-//        log.info("Пользователь {} удалил лайк фильму {}.", user.getName(), film.getName());
-//        film.setRate(film.getRate() - 1);
-//        film.removeUserLikeFilm(userId);
-//        return film;
-//    }
+    public Film addLike(Long filmId, Long userId)  {
+        User user = validator.userIsPresent(userId);
+        Film film = validator.filmIsPresent(filmId);
+        log.info("Пользователь {} добавил лайк фильму {}.", user.getName(), film.getName());
+        film.setRate(film.getRate() + 1);
+        film.setUserAddLikeFilm(userId);
+        filmStorage.addLike(filmId, userId);
+        return film;
+    }
+
+    public Film removeLike(Long filmId, Long userId)  {
+        User user = validator.userIsPresent(userId);
+        Film film = validator.filmIsPresent(filmId);
+        log.info("Пользователь {} удалил лайк фильму {}.", user.getName(), film.getName());
+        film.setRate(film.getRate() - 1);
+        film.removeUserLikeFilm(userId);
+        filmStorage.removeLike(filmId, userId);
+        return film;
+    }
 
     public List<Film> filmsPopular(Integer count) {
         return filmStorage.getFilms().stream()
