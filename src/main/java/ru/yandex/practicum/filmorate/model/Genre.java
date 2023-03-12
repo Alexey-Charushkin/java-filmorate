@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 public
 class Genre {
     private int id;
-    private Genres genre;
+    private String genreName;
 }
 
-enum Genres {КОМЕДИЯ, ДРАМА, МУЛЬТФИЛЬМ, ТРИЛЛЕР, ДОКУМЕНТАЛЬНЫЙ, БОЕВИК}

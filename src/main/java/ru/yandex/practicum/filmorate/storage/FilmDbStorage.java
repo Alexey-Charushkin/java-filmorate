@@ -47,6 +47,7 @@ public class FilmDbStorage implements FilmDaoStorage {
             throw new FilmNotFoundException("Ошибка! Фильм с id " + idFilm + " не найден.");
         }
         film.getMpa().setName(getMPAName(film.getMpa().getId()));
+        film.setGenres(getGenresByIdFilm(film.getId()));
 //        List<Long> userFriendsId = findUserFriendsById(idUser);
 //        for (Long id : userFriendsId) {
 //            user.setUserFriendsId(id);
@@ -60,10 +61,22 @@ public class FilmDbStorage implements FilmDaoStorage {
         List<Film> films = jdbcTemplate.query("SELECT * FROM films", new FilmDbStorage.FilmMapper());
         for (Film film : films) {
             film.getMpa().setName(getMPAName(film.getMpa().getId()));
+            film.setGenres(getGenresByIdFilm(film.getId()));
         }
         return films;
     }
 
+    public List<Genre> getGenresByIdFilm(Long idFilm) {
+
+        jdbcTemplate = new JdbcTemplate(dataSource);
+        List<Genre> genres = jdbcTemplate.query("SELECT fg.genre_id, g.genre_name FROM films_genres AS fg JOIN " +
+                        "genre AS g ON fg.genre_id = g.genre_id WHERE fg.film_id = ?",
+                new Object[]{idFilm}, new FilmDbStorage.GenreMapper());
+        for (Genre genre: genres) {
+            genre.setGenreName(getGenreName(genre.getId()));
+        }
+        return genres;
+    }
     @Override
     public void add(Film film) {
         GeneratedKeyHolder generatedKeyHolder = new GeneratedKeyHolder();
@@ -93,9 +106,11 @@ public class FilmDbStorage implements FilmDaoStorage {
                 }, generatedKeyHolder);
 
         Long id = (long) Objects.requireNonNull(generatedKeyHolder.getKey()).intValue();
-        film.setId(id);
 
+        film.setId(id);
         film.getMpa().setName(getMPAName(film.getMpa().getId()));
+        addFilmsGenresId(film);
+        film.setGenres((getGenresByIdFilm(film.getId())));
 
         log.info("rowsAffected = {}, id={}", rowsAffected, id);
         log.info("Фильм добавлен {}.", film);
@@ -114,6 +129,21 @@ public class FilmDbStorage implements FilmDaoStorage {
         log.info("Фильм обновлён с id {}, {}.", film.getId(), film);
     }
 
+
+//    public void defineFriendStatus(Long userId, Long friendId) {
+//
+//        String friendStatus = "";
+//
+//        if (isFriendExist(userId, friendId) && isFriendExist(friendId, userId)) {
+//            friendStatus = "подтверждённая";
+//            jdbcTemplate.update("UPDATE users_friends_id SET friend_status = ? WHERE user_id = ?", friendStatus, friendId);
+//            jdbcTemplate.update("UPDATE users_friends_id SET friend_status = ? WHERE user_id = ?", friendStatus, userId);
+//        } else {
+//            friendStatus = "неподтверждённая";
+//            jdbcTemplate.update("UPDATE users_friends_id SET friend_status = ? WHERE user_id = ?", friendStatus, friendId);
+//        }
+//    }
+
     private String getMPAName(Integer idMPA) {
         String mpaName = "";
         try {
@@ -128,7 +158,29 @@ public class FilmDbStorage implements FilmDaoStorage {
             throw new FilmNotFoundException("Ошибка! MPA рейтинг с id " + idMPA + " не найден.");
         }
     }
+    private String getGenreName(Integer idGenre) {
+        String genreName = "";
+        try {
+            jdbcTemplate = new JdbcTemplate(dataSource);
+            genreName = jdbcTemplate.queryForObject("SELECT genre_name FROM genre WHERE  genre_id = ?",
+                    new Object[]{idGenre}, String.class);
 
+            log.info("Жанр с id {} найден.", idGenre);
+            return genreName;
+        } catch (Exception ex) {
+            log.info("Ошибка! Жанр с id {} не найден.", idGenre);
+            throw new FilmNotFoundException("Ошибка! Жанр с id " + idGenre + " не найден.");
+        }
+    }
+    private static final class GenreMapper implements RowMapper<Genre> {
+        public Genre mapRow(ResultSet rs, int rowNum) throws SQLException {
+            Genre genre =new Genre();
+
+            genre.setId(rs.getInt("genre_id"));
+            genre.setGenreName(rs.getString("genre_name"));
+           return genre;
+        }
+    }
     private static final class FilmMapper implements RowMapper<Film> {
         public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
             Film film = new Film();
@@ -177,6 +229,29 @@ public class FilmDbStorage implements FilmDaoStorage {
                 return mpaToAdd.size();
             }
         });
+    }
+
+    private void addFilmsGenresId(Film film) {
+
+        jdbcTemplate = new JdbcTemplate(dataSource);
+
+        List<Genre> genreToAdd = new ArrayList<>(film.getGenres());
+
+        String sql = "INSERT INTO films_genres (film_id, genre_id) VALUES (?, ?)";
+        int[] rowsAffected = jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement preparedStatement, int i) throws SQLException {
+                Genre genre = genreToAdd.get(i);
+                preparedStatement.setLong(1, film.getId());
+                preparedStatement.setInt(2, genre.getId());
+            }
+
+            @Override
+            public int getBatchSize() {
+                return genreToAdd.size();
+            }
+        });
+
     }
 
     private void addGenres() {
