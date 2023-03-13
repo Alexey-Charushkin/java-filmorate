@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,18 +16,22 @@ import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.Validate;
+import ru.yandex.practicum.filmorate.storage.FilmDaoStorage;
 import ru.yandex.practicum.filmorate.storage.UserDaoStorage;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.jupiter.api.Assertions.*;
+
+import lombok.*;
+
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -40,6 +45,8 @@ class FilmorateApplicationTests {
     @Autowired
     private UserController userController;
     private final UserDaoStorage userStorage;
+
+    private final FilmDaoStorage filmStorage;
     @Autowired
     private Validate validate;
 
@@ -54,8 +61,8 @@ class FilmorateApplicationTests {
 
     User userFailName = new User("friend@common.ru",
             "userLogin", null, LocalDate.of(2000, 8, 20), null);
-    Film film = new Film("Super Film", "Super film description",
-            LocalDate.of(1967, 3, 25), 100, null, null, null, null);
+
+
     Film filmFailDescription = new Film("Film name", "Пятеро друзей ( комик-группа «Шарло»)," +
             " приезжают в город Бризуль. Здесь они хотят разыскать господина Огюста Куглова," +
             " который задолжал им деньги, а именно 20 миллионов. о Куглов, который за время «своего отсутствия»," +
@@ -191,4 +198,155 @@ class FilmorateApplicationTests {
         assertThat(idFriends.size(), equalTo(2));
 
     }
+
+
+    @Test
+    public void testAddFilm() {
+
+        MPA mpa = new MPA();
+        mpa.setId(1);
+
+        Genre genre = new Genre();
+        genre.setId(2);
+        List<Genre> genres = new ArrayList<>();
+        genres.add(genre);
+
+        Set<Long> usersFilmsLikes = new HashSet<>();
+
+        Film film = new Film("Super Film", "Super film description",
+                LocalDate.of(1967, 3, 25), 100, 0, mpa, genres, usersFilmsLikes);
+
+        long filmId = 1L;
+
+        filmStorage.add(film);
+        Optional<Film> filmOptional = Optional.ofNullable(filmStorage.getFilm(filmId));
+
+        assertTrue(filmOptional.isPresent());
+        assertThat(filmOptional.get().getId(), is(filmId));
+
+    }
+
+    @Test
+    public void testFindFilmById() {
+        MPA mpa = new MPA();
+        mpa.setId(1);
+
+        Genre genre = new Genre();
+        genre.setId(2);
+        List<Genre> genres = new ArrayList<>();
+        genres.add(genre);
+
+        Set<Long> usersFilmsLikes = new HashSet<>();
+
+        Film film = new Film("Super Film", "Super film description",
+                LocalDate.of(1967, 3, 25), 100, 0, mpa, genres, usersFilmsLikes);
+
+        long filmId = 1L;
+
+        filmStorage.add(film);
+
+        Optional<Film> filmOptional = Optional.ofNullable(filmStorage.getFilm(filmId));
+
+        assertTrue(filmOptional.isPresent());
+        assertThat(filmOptional.get().getId(), is(filmId));
+
+    }
+    @Test
+    public void testFindAllFilms() {
+        MPA mpa = new MPA();
+        mpa.setId(1);
+
+        Genre genre = new Genre();
+        genre.setId(2);
+        List<Genre> genres = new ArrayList<>();
+        genres.add(genre);
+
+        Set<Long> usersFilmsLikes = new HashSet<>();
+
+        Film film = new Film("Super Film", "Super film description",
+                LocalDate.of(1967, 3, 25), 100, 0, mpa, genres, usersFilmsLikes);
+
+        Film film2 = new Film("Super Film2", "Super film description2",
+                LocalDate.of(1967, 11, 14), 100, 0, mpa, genres, usersFilmsLikes);
+
+        filmStorage.add(film);
+        filmStorage.add(film2);
+
+        List<Film> filmList = filmStorage.getFilms();
+
+        assertNotNull(filmList);
+        assertThat(filmList.size(), equalTo(2));
+
+    }
+
+    @Test
+    public void updateFilm() {
+        long filmId = 1L;
+
+        MPA mpa = new MPA();
+        mpa.setId(1);
+
+        Genre genre = new Genre();
+        genre.setId(2);
+        List<Genre> genres = new ArrayList<>();
+        genres.add(genre);
+
+        Set<Long> usersFilmsLikes = new HashSet<>();
+
+        Film film = new Film("Super Film", "Super film description",
+                LocalDate.of(1967, 3, 25), 100, 0, mpa, genres, usersFilmsLikes);
+
+        Film updateFilm = new Film("Update Super Film2", "Update Super film description2",
+                LocalDate.of(1967, 11, 14), 100, 0, mpa, genres, usersFilmsLikes);
+        updateFilm.setId(filmId);
+
+        filmStorage.add(film);
+
+        Optional<Film> filmOptional = Optional.ofNullable(filmStorage.getFilm(filmId));
+
+        assertTrue(filmOptional.isPresent());
+        assertThat(filmOptional.get().getId(), is(filmId));
+
+        filmStorage.update(updateFilm);
+
+        filmOptional = Optional.ofNullable(filmStorage.getFilm(filmId));
+
+        assertTrue(filmOptional.isPresent());
+        assertThat(filmOptional.get().getId(), is(filmId));
+        assertThat(filmOptional.get().getName(), is("Update Super Film2"));
+        assertThat(filmOptional.get().getDescription(), is("Update Super film description2"));
+    }
+
+    @Test
+    public void addLike() {
+        userStorage.add(user1);
+
+        MPA mpa = new MPA();
+        mpa.setId(1);
+
+        Genre genre = new Genre();
+        genre.setId(2);
+
+        List<Genre> genres = new ArrayList<>();
+        genres.add(genre);
+
+        Set<Long> usersFilmsLikes = new HashSet<>();
+
+        Film film = new Film("Super Film", "Super film description",
+                LocalDate.of(1967, 3, 25), 100, 0, mpa, genres, usersFilmsLikes);
+
+        filmStorage.add(film);
+
+        filmStorage.addLike(film.getId(), user1.getId());
+
+        Film film1 = filmStorage.getFilm(1L);
+
+     //   Set<Long> usersLikesId = film1.getUserFilmLikes();
+//        Long userId = usersLikesId.stream().filter(data -> Objects.equals(data, 1L)).findFirst().get();
+//
+//        assertNotNull(usersLikesId);
+//        assertThat(userId, is(1L));
+
+    }
+
 }
