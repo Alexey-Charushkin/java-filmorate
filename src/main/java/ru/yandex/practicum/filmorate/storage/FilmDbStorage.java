@@ -48,6 +48,11 @@ public class FilmDbStorage implements FilmDaoStorage {
         }
         film.getMpa().setName(getMPAName(film.getMpa().getId()));
         film.setGenres(getGenresByIdFilm(film.getId()));
+        List<Long> usersLikesId = new ArrayList<>();
+        usersLikesId.addAll(getLikesByIdFilm(film.getId()));
+        for (Long userid : usersLikesId) {
+            film.setUserAddLikeFilm(userid);
+        }
 
         return film;
     }
@@ -56,9 +61,16 @@ public class FilmDbStorage implements FilmDaoStorage {
     public List<Film> getFilms() {
         jdbcTemplate = new JdbcTemplate(dataSource);
         List<Film> films = jdbcTemplate.query("SELECT * FROM films", new FilmDbStorage.FilmMapper());
+
+        List<Long> usersLikesId = new ArrayList<>();
         for (Film film : films) {
             film.getMpa().setName(getMPAName(film.getMpa().getId()));
             film.setGenres(getGenresByIdFilm(film.getId()));
+
+            usersLikesId.addAll(getLikesByIdFilm(film.getId()));
+            for (Long userid : usersLikesId) {
+                film.setUserAddLikeFilm(userid);
+            }
         }
         return films;
     }
@@ -122,6 +134,11 @@ public class FilmDbStorage implements FilmDaoStorage {
 
         film.setGenres((getGenresByIdFilm(film.getId())));
 
+        List<Long> usersLikesId = new ArrayList<>();
+        usersLikesId.addAll(getLikesByIdFilm(film.getId()));
+        for (Long userid : usersLikesId) {
+            film.setUserAddLikeFilm(userid);
+        }
         log.info("Фильм обновлён с id {}, {}.", film.getId(), film);
     }
 
@@ -174,11 +191,11 @@ public class FilmDbStorage implements FilmDaoStorage {
         log.info("Пользователь  с id {} удалил лайк фильму с id {}.", userId, filmId);
     }
 
-    @Override
-    public void addMPARating(Film film) {
-        String sql = "INSERT INTO films (film_id, genre_id) VALUES (?, ?)";
-        jdbcTemplate.update(sql, film.getId(), film.getMpa().getId());
-    }
+
+//    private void addMPARating(Film film) {
+//        String sql = "INSERT INTO films (film_id, genre_id) VALUES (?, ?)";
+//        jdbcTemplate.update(sql, film.getId(), film.getMpa().getId());
+//    }
 
     @Override
     public List<Genre> getAllGenres() {
@@ -229,25 +246,6 @@ public class FilmDbStorage implements FilmDaoStorage {
         return mpa;
     }
 
-    public List<Genre> getGenresByIdFilm(Long idFilm) {
-
-        jdbcTemplate = new JdbcTemplate(dataSource);
-        List<Genre> genres = jdbcTemplate.query("SELECT fg.genre_id, g.genre_name FROM films_genres AS fg JOIN " +
-                        "genre AS g ON fg.genre_id = g.genre_id WHERE fg.film_id = ?",
-                new Object[]{idFilm}, new FilmDbStorage.GenreMapper());
-        for (Genre genre : genres) {
-            genre.setName(getGenreName(genre.getId()));
-        }
-        return genres;
-    }
-
-    private void removeGenres(Long idFilm) {
-        jdbcTemplate = new JdbcTemplate(dataSource);
-
-        jdbcTemplate.update("DELETE FROM films_genres where film_id = ?", idFilm);
-
-    }
-
     private String getMPAName(Integer idMPA) {
         String mpaName;
         try {
@@ -262,7 +260,17 @@ public class FilmDbStorage implements FilmDaoStorage {
             throw new FilmNotFoundException("Ошибка! MPA рейтинг с id " + idMPA + " не найден.");
         }
     }
+    private List<Genre> getGenresByIdFilm(Long idFilm) {
 
+        jdbcTemplate = new JdbcTemplate(dataSource);
+        List<Genre> genres = jdbcTemplate.query("SELECT fg.genre_id, g.genre_name FROM films_genres AS fg JOIN " +
+                        "genre AS g ON fg.genre_id = g.genre_id WHERE fg.film_id = ?",
+                new Object[]{idFilm}, new FilmDbStorage.GenreMapper());
+        for (Genre genre : genres) {
+            genre.setName(getGenreName(genre.getId()));
+        }
+        return genres;
+    }
     private String getGenreName(Integer idGenre) {
         String genreName;
         try {
@@ -278,6 +286,12 @@ public class FilmDbStorage implements FilmDaoStorage {
         }
     }
 
+    private void removeGenres(Long idFilm) {
+        jdbcTemplate = new JdbcTemplate(dataSource);
+
+        jdbcTemplate.update("DELETE FROM films_genres where film_id = ?", idFilm);
+
+    }
     private void changeRate(Long filmId, Integer rate) {
 
         jdbcTemplate.update("UPDATE films SET rate = ? WHERE film_id = ?", rate, filmId);
@@ -291,6 +305,20 @@ public class FilmDbStorage implements FilmDaoStorage {
         return count > 0;
     }
 
+    private Set<Long> getLikesByIdFilm(Long filmId) {
+
+        Set<Long> usersLikeId = new HashSet<>();
+
+        jdbcTemplate = new JdbcTemplate(dataSource);
+
+        List<Long> likesId = jdbcTemplate.queryForList("SELECT user_id FROM users_films_like WHERE film_id = ?",
+                Long.class, filmId);
+        for (Long userLikeId : likesId) {
+           usersLikeId.add(userLikeId);
+        }
+        return usersLikeId;
+
+    }
     private boolean isTableEmpty(JdbcTemplate jdbcTemplate, String tableName) {
         int count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM " + tableName, Integer.class);
         return count == 0;

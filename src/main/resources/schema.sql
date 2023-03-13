@@ -60,3 +60,4 @@ ALTER TABLE `users_friends_id` ADD FOREIGN KEY (`friend_id`) REFERENCES `users` 
 ALTER TABLE `films` ADD FOREIGN KEY (`mpa_rating_id`) REFERENCES `mpa_rating` (`id`);
 
 
+

@@ -8,5 +8,5 @@ public interface FilmDaoStorage extends FilmStorage {
 
     void removeLike(Long filmId, Long userId);
 
-    void addMPARating(Film film);
+    //void addMPARating(Film film);
 }
