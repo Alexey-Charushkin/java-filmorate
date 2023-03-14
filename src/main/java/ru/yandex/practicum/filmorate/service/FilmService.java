@@ -6,15 +6,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -40,8 +37,11 @@ public class FilmService {
 
     public ResponseEntity<?> update(Film film) {
         Optional<Film> oldItem = Optional.ofNullable(filmStorage.getFilm(film.getId()));
-                validator.validate(film);
-        filmStorage.update(film);
+        validator.validate(film);
+
+        if (oldItem.isPresent()) {
+            filmStorage.update(film);
+        }
         return new ResponseEntity<>(film, HttpStatus.OK);
     }
 
@@ -55,7 +55,7 @@ public class FilmService {
         return filmStorage.getFilm(id);
     }
 
-    public Film addLike(Long filmId, Long userId)  {
+    public Film addLike(Long filmId, Long userId) {
         User user = validator.userIsPresent(userId);
         Film film = validator.filmIsPresent(filmId);
         log.info("Пользователь {} добавил лайк фильму {}.", user.getName(), film.getName());
@@ -65,7 +65,7 @@ public class FilmService {
         return film;
     }
 
-    public Film removeLike(Long filmId, Long userId)  {
+    public Film removeLike(Long filmId, Long userId) {
         User user = validator.userIsPresent(userId);
         Film film = validator.filmIsPresent(filmId);
         log.info("Пользователь {} удалил лайк фильму {}.", user.getName(), film.getName());
@@ -85,7 +85,7 @@ public class FilmService {
     Comparator<Film> comparator = (o1, o2) -> o2.getRate() - o1.getRate();
 
     public List<Genre> getAllGenres() {
-                return filmStorage.getAllGenres();
+        return filmStorage.getAllGenres();
     }
 
 

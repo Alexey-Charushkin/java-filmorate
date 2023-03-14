@@ -6,7 +6,6 @@ import lombok.*;
 import javax.validation.constraints.Email;
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -31,8 +30,5 @@ public class User extends Item {
 
     public Set<Long> getUserFriendsId() {
         return userFriendsId;
-    }
-    public void removeFriends(User user) {
-        userFriendsId.remove(user);
     }
 }

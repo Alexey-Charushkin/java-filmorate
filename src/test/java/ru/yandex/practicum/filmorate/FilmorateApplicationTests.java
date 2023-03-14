@@ -32,6 +32,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FilmorateApplicationTests {
 
     private final UserDaoStorage userStorage;
+
     private final FilmDaoStorage filmStorage;
     @Autowired
     private Validate validate;
@@ -98,7 +99,10 @@ class FilmorateApplicationTests {
 
         assertTrue(userOptional.isPresent());
         assertThat(userOptional.get().getId(), is(userId));
-
+        assertThat(userOptional.get().getLogin(), is(user1.getLogin()));
+        assertThat(userOptional.get().getName(), is(user1.getName()));
+        assertThat(userOptional.get().getEmail(), is(user1.getEmail()));
+        assertThat(userOptional.get().getBirthday(), is(user1.getBirthday()));
     }
 
     @Test
@@ -217,7 +221,12 @@ class FilmorateApplicationTests {
 
         assertTrue(filmOptional.isPresent());
         assertThat(filmOptional.get().getId(), is(filmId));
-
+        assertThat(filmOptional.get().getName(), is(film.getName()));
+        assertThat(filmOptional.get().getDescription(), is(film.getDescription()));
+        assertThat(filmOptional.get().getReleaseDate(), is(film.getReleaseDate()));
+        assertThat(filmOptional.get().getDuration(), is(film.getDuration()));
+        assertThat(filmOptional.get().getUserFilmLikes(), is(film.getUserFilmLikes()));
+        assertThat(filmOptional.get().getRate(), is(film.getRate()));
     }
 
     @Test
@@ -276,13 +285,13 @@ class FilmorateApplicationTests {
 
         filmStorage.addLike(film.getId(), user1.getId());
 
-        Film film1 = filmStorage.getFilm(1L);
+        Film film1 = filmStorage.getFilm(4L);
 
         Set<Long> usersLikesId = film1.getUserFilmLikes();
-        Long userId = usersLikesId.stream().filter(data -> Objects.equals(data, 1L)).findFirst().get();
+        Long userId = usersLikesId.stream().filter(data -> Objects.equals(data, 4L)).findFirst().get();
 
         assertNotNull(usersLikesId);
-        assertThat(userId, is(1L));
+        assertThat(userId, is(4L));
     }
 
     @Test
@@ -293,13 +302,13 @@ class FilmorateApplicationTests {
 
         filmStorage.addLike(film.getId(), user1.getId());
 
-        Film film1 = filmStorage.getFilm(1L);
+        Film film1 = filmStorage.getFilm(4L);
 
         Set<Long> usersLikesId = film1.getUserFilmLikes();
-        Long userId = usersLikesId.stream().filter(data -> Objects.equals(data, 1L)).findFirst().get();
+        Long userId = usersLikesId.stream().filter(data -> Objects.equals(data, 4L)).findFirst().get();
 
         assertNotNull(usersLikesId);
-        assertThat(userId, is(1L));
+        assertThat(userId, is(4L));
 
         filmStorage.removeLike(film.getId(), user1.getId());
 

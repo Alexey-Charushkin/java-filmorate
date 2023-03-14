@@ -20,13 +20,13 @@ class GenreController {
 
     @GetMapping()
     public List<Genre> findAllGenres() {
-        // log.info("Текущее количество жанров фильмов: {}", filmService.getAllGenres.size());
+        log.info("Текущее количество жанров фильмов: {}", filmService.getAllGenres().size());
         return new ArrayList<>(filmService.getAllGenres());
     }
 
     @GetMapping("{id}")
     public Genre findById(@PathVariable Long id) {
-        // log.info("Текущее количество жанров фильмов: {}", filmService.getAllGenres.size());
+        log.info("Жанр фильма с id {}: {}", id, filmService.getGenreById(id));
         return filmService.getGenreById(id);
     }
 }

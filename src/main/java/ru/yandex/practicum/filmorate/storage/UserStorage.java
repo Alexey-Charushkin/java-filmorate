@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface UserStorage {
+
     Map<Long, User> users = new HashMap<>();
 
     User findUserById(Long id);

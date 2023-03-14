@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -24,13 +23,13 @@ public class MPAController {
 
     @GetMapping()
     public List<MPA> findAllMPAs() {
-        // log.info("Текущее количество жанров фильмов: {}", filmService.getAllGenres.size());
+        log.info("Текущее количество MPA рейтингов: {}", filmService.getAllMPA().size());
         return new ArrayList<>(filmService.getAllMPA());
     }
 
     @GetMapping("{id}")
     public MPA findMPAById(@PathVariable Long id) {
-        // log.info("Текущее количество жанров фильмов: {}", filmService.getAllGenres.size());
+        log.info("MPA рейтинг фильма с id {} : {}", id, filmService.getMPAById(id));
         return filmService.getMPAById(id);
     }
 

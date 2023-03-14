@@ -43,9 +43,9 @@ public class UserDbStorage implements UserDaoStorage {
         }
         List<Long> userFriendsId = findUserFriendsById(idUser);
         for (Long id : userFriendsId) {
+            assert user != null;
             user.setUserFriendsId(id);
         }
-        //defineFriendStatus(Long userId, Long friendId)
         return user;
     }
 
@@ -139,7 +139,7 @@ public class UserDbStorage implements UserDaoStorage {
 
     public void defineFriendStatus(Long userId, Long friendId) {
 
-        String friendStatus = "";
+        String friendStatus;
 
         if (isFriendExist(userId, friendId) && isFriendExist(friendId, userId)) {
             friendStatus = "подтверждённая";

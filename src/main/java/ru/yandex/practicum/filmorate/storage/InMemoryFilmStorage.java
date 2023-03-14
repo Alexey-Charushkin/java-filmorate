@@ -19,18 +19,17 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public Film getFilm(Long id) {
-      //  return films.get(id);
-        return null;
+        return films.get(Math.toIntExact(id));
     }
 
     @Override
     public void add(Film film) {
-       // films.add(film.getId(), film);
+       films.add(Math.toIntExact(film.getId()), film);
     }
 
     @Override
     public void update(Film film) {
-        //films.put(film.getId(), film);
+        films.add(Math.toIntExact(film.getId()), film);
     }
 
     @Override

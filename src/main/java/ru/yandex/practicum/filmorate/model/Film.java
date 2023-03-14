@@ -24,7 +24,6 @@ public class Film extends Item {
     private MPA mpa;
     private List<Genre> genres;
 
-
     @JsonIgnore
     private Set<Long> userFilmLikes = new HashSet<>();
 
