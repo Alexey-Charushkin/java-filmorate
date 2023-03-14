@@ -21,8 +21,6 @@ public class User extends Item {
     private String name;
     @NonNull
     private LocalDate birthday;
-    private FriendStatus friendStatus;
-
     @JsonIgnore
     private Set<Long> userFriendsId = new HashSet<>();
 
@@ -32,9 +30,5 @@ public class User extends Item {
 
     public Set<Long> getUserFriendsId() {
         return userFriendsId;
-    }
-
-    public void removeFriends(User user) {
-        userFriendsId.remove(user);
     }
 }

@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 
 public class ErrorResponse {
-    private String description;
+    private final String description;
     public ErrorResponse(String description) {
         this.description = description;
     }

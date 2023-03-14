@@ -20,9 +20,9 @@ public class Film extends Item {
     private String description;
     private LocalDate releaseDate;
     private Integer duration;
-    private MPARating mpaRating;
-    private List<String> genreNames;
     private Integer rate = 0;
+    private MPA mpa;
+    private List<Genre> genres;
 
     @JsonIgnore
     private Set<Long> userFilmLikes = new HashSet<>();

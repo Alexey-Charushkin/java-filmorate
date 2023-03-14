@@ -2,10 +2,8 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.EmptyFilmException;
-import ru.yandex.practicum.filmorate.exceptions.EmptyUserException;
+import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -77,8 +75,12 @@ public class Validate<T> {
         Optional<User> isUser = Optional.ofNullable(userStorage.findUserById(id));
         if (!isUser.isPresent()) {
             log.warn("Пользователь c id {} отсутствует в базе.", id);
-            throw new EmptyUserException("Пользователь с id " + id
-                    + " отсутствует в базе.");
+            try {
+                throw new FilmNotFoundException("Пользователь с id " + id
+                        + " отсутствует в базе.");
+            } catch (FilmNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
         return isUser.get();
     }
@@ -87,8 +89,12 @@ public class Validate<T> {
         Optional<Film> isFilm = Optional.ofNullable(filmStorage.getFilm(id));
         if (!isFilm.isPresent()) {
             log.warn("Фильм c id {} отсутствует в базе.", id);
-            throw new EmptyFilmException("Фильм с id " + id
-                    + " отсутствует в базе.");
+            try {
+                throw new FilmNotFoundException("Фильм с id " + id
+                        + " отсутствует в базе.");
+            } catch (FilmNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
         return isFilm.get();
     }

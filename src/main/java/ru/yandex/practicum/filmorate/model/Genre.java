@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 @Getter
 @Setter
 @RequiredArgsConstructor
+public
 class Genre {
-    private String nameGenre;
+    private int id;
+    private String name;
 }
+
