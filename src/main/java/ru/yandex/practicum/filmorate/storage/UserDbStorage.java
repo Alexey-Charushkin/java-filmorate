@@ -39,7 +39,7 @@ public class UserDbStorage implements UserDaoStorage {
             log.info("Пользователь с id {} найден.", idUser);
         } catch (Exception ex) {
             log.info("Ошибка! Пользователь с id {} не найден.", idUser);
-            throw new UserNotFoundException("Ошибка! Пользователь с id " + idUser + " не найден.");
+            throw new UserNotFoundException("Ошибка! Пользователь с id %s не найден.", idUser);
         }
         List<Long> userFriendsId = findUserFriendsById(idUser);
         for (Long id : userFriendsId) {
@@ -174,7 +174,7 @@ public class UserDbStorage implements UserDaoStorage {
             log.info("Количество друзей пользователя с id {}: {}.", idUser, friendsId.size());
         } catch (Exception ex) {
             log.info("У пользователя с id {} нет друзей.", idUser);
-            throw new UserNotFoundException("Список друзей пользователя с id " + idUser + " пуст.");
+            throw new UserNotFoundException("Список друзей пользователя с id %s пуст.", idUser);
         }
         return friendsId;
     }

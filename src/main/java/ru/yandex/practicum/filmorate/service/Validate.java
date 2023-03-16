@@ -76,8 +76,7 @@ public class Validate<T> {
         if (!isUser.isPresent()) {
             log.warn("Пользователь c id {} отсутствует в базе.", id);
             try {
-                throw new FilmNotFoundException("Пользователь с id " + id
-                        + " отсутствует в базе.");
+                throw new FilmNotFoundException("Пользователь с id %s отсутствует в базе.", id);
             } catch (FilmNotFoundException e) {
                 throw new RuntimeException(e);
             }
@@ -90,8 +89,7 @@ public class Validate<T> {
         if (!isFilm.isPresent()) {
             log.warn("Фильм c id {} отсутствует в базе.", id);
             try {
-                throw new FilmNotFoundException("Фильм с id " + id
-                        + " отсутствует в базе.");
+                throw new FilmNotFoundException("Фильм с id %s отсутствует в базе.", id);
             } catch (FilmNotFoundException e) {
                 throw new RuntimeException(e);
             }

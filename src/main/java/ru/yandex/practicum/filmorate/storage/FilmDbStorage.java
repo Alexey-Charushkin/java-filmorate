@@ -44,7 +44,7 @@ public class FilmDbStorage implements FilmDaoStorage {
             log.info("Фильм с id {} найден.", idFilm);
         } catch (Exception ex) {
             log.info("Ошибка! Фильм с id {} не найден.", idFilm);
-            throw new FilmNotFoundException("Ошибка! Фильм с id " + idFilm + " не найден.");
+            throw new FilmNotFoundException("Ошибка! Фильм с id %s найден.", idFilm);
         }
         film.getMpa().setName(getMPAName(film.getMpa().getId()));
         film.setGenres(getGenresByIdFilm(film.getId()));
@@ -208,7 +208,7 @@ public class FilmDbStorage implements FilmDaoStorage {
                     new GenreMapper(), id);
         } catch (Exception ex) {
             log.info("Ошибка! Жанр фильма с id {} не найден.", id);
-            throw new FilmNotFoundException("Ошибка! Жанр фильма с id " + id + " не найден.");
+            throw new FilmNotFoundException("Ошибка! Жанр фильма с id %s не найден.", id);
         }
         return genre;
     }
@@ -231,7 +231,7 @@ public class FilmDbStorage implements FilmDaoStorage {
                     new MPAMapper(), id);
         } catch (Exception ex) {
             log.info("Ошибка! MPA рейтинг фильма с id {} не найден.", id);
-            throw new FilmNotFoundException("Ошибка! MPA рейтинг фильма с id " + id + " не найден.");
+            throw new FilmNotFoundException("Ошибка! MPA рейтинг фильма с id %s не найден.", id);
         }
         return mpa;
     }
@@ -247,7 +247,7 @@ public class FilmDbStorage implements FilmDaoStorage {
             return mpaName;
         } catch (Exception ex) {
             log.info("Ошибка! MPA рейтинг с id {} не найден.", idMPA);
-            throw new FilmNotFoundException("Ошибка! MPA рейтинг с id " + idMPA + " не найден.");
+            throw new FilmNotFoundException("Ошибка! MPA рейтинг с id %s не найден.", (long) idMPA);
         }
     }
 
@@ -274,7 +274,7 @@ public class FilmDbStorage implements FilmDaoStorage {
             return genreName;
         } catch (Exception ex) {
             log.info("Ошибка! Жанр с id {} не найден.", idGenre);
-            throw new FilmNotFoundException("Ошибка! Жанр с id " + idGenre + " не найден.");
+            throw new FilmNotFoundException("Ошибка! Жанр с id %s не найден.", (long) idGenre);
         }
     }
 
