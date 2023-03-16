@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFoundException;
@@ -15,11 +17,12 @@ import java.util.Optional;
 
 @Log4j2
 @Service
+@FieldDefaults(makeFinal=true, level= AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public class Validate<T> {
 
-    private final UserStorage userStorage;
-    private final FilmStorage filmStorage;
+    UserStorage userStorage;
+    FilmStorage filmStorage;
 
     public void validate(T item) {
         if (item.getClass().equals(Film.class)) {

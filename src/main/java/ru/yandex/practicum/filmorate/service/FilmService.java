@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
@@ -19,17 +21,15 @@ import java.util.stream.Collectors;
 
 @Log4j2
 @Service
+@FieldDefaults(makeFinal=true, level= AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public class FilmService {
     @Qualifier("FilmDbStorage")
-    private final FilmStorage filmStorage;
-    private final Validate validator;
-
-    private Long id = 0L;
+    FilmStorage filmStorage;
+    Validate validator;
 
     public Film create(Film film) {
         validator.validate(film);
-        film.setId(++id);
         filmStorage.add(film);
         return film;
     }

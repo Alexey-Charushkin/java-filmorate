@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +15,13 @@ import java.util.stream.Collectors;
 
 @Log4j2
 @Service
+@FieldDefaults(makeFinal=true, level= AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 public class UserService {
 
-    private final Validate validator;
+    Validate validator;
 
-    private final UserStorage userStorage;
+    UserStorage userStorage;
 
       public User create(User user) {
         validator.validate(user);

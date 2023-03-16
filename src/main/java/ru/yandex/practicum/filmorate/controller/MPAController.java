@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,9 +15,10 @@ import java.util.List;
 
 @Log4j2
 @RestController
+@FieldDefaults(makeFinal=true, level= AccessLevel.PRIVATE)
 @RequestMapping("/mpa")
 public class MPAController {
-    private final FilmService filmService;
+    FilmService filmService;
 
     MPAController(FilmService filmService) {
         this.filmService = filmService;

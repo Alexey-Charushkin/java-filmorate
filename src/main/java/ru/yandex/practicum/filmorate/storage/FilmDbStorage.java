@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -23,10 +25,11 @@ import java.util.*;
 
 @Component("FilmDbStorage")
 @Primary
+@FieldDefaults(level= AccessLevel.PRIVATE)
 @RequiredArgsConstructor
 @Log4j2
 public class FilmDbStorage implements FilmDaoStorage {
-    private DataSource dataSource;
+    DataSource dataSource;
     JdbcTemplate jdbcTemplate;
 
     @Autowired
