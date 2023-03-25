@@ -5,10 +5,11 @@ import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
-@EqualsAndHashCode
+@ToString
 @FieldDefaults(level=AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-public abstract class Item {
-    Long id;
+public class MPA {
+    Integer id;
+    String name;
 }

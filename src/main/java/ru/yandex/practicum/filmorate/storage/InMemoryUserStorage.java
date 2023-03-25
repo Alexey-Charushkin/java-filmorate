@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import java.util.*;
 
 @Log4j2
-@Component
+@Component("InMemoryUserStorage")
 public class InMemoryUserStorage implements UserStorage {
 
     @Override
@@ -16,10 +16,9 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Map<Long, User> getUsers() {
-        return users;
+    public List<User> getUsers() {
+        return new ArrayList<>();
     }
-
     @Override
     public void add(User user) {
         users.put(user.getId(), user);
@@ -31,7 +30,17 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public void remove(User user) {
-        users.remove(user);
+    public void remove(Long id) {
+        users.remove(id);
+    }
+
+    @Override
+    public void addFriend(Long userId, Long friendId) {
+
+    }
+
+    @Override
+    public void removeFriend(Long userId, Long friendId) {
+
     }
 }

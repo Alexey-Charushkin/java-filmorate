@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -12,17 +13,18 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString
+@FieldDefaults(level=AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Film extends Item {
 
-    private String name;
-    private String description;
-    private LocalDate releaseDate;
-    private Integer duration;
-    private MPARating mpaRating;
-    private List<String> genreNames;
-    private Integer rate = 0;
+    String name;
+    String description;
+    LocalDate releaseDate;
+    Integer duration;
+    Integer rate = 0;
+    MPA mpa;
+    List<Genre> genres;
 
     @JsonIgnore
     private Set<Long> userFilmLikes = new HashSet<>();
