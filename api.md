@@ -1,0 +1,19 @@
+| Functionality    | Method | Endpoints                                                  |
+|------------------|--------|------------------------------------------------------------|
+| Core             | POST   | /users                                                     | 
+| Core             | POST   | /films                                                     | 
+| Core             | GET    | /users                                                     |
+| Core             | GET    | /films                                                     |
+| Core             | GET    | /genres                                                    |
+| Core             | GET    | /mpa                                                       |
+| Core             | GET    | /genres/{id}                                               |
+| Core             | GET    | /users/{id}                                                |
+| Core             | GET    | /films/{id}                                                |
+| Core             | GET    | /mpa/{id}                                                  |
+| Core             | GET    | /reviews/{id}                                              |
+| Core             | PUT    | /films                                                     |
+| Core             | PUT    | /users                                                     |
+| Core             | PUT    | /reviews                                                   |
+| Core             | DELETE | /users/{id}                                                |
+| Core             | DELETE | /films/{id}                                                |
+| Core             | DELETE | /reviews/{id}                                              |
